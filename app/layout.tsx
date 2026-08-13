@@ -21,10 +21,12 @@ export const metadata: Metadata = {
 const sidebarLinks = [
   { label: "Início", href: "/" },
   { label: "Clientes", href: "/clientes" },
+  { label: "Novo Cliente", href: "/clientes/novo" },
   { label: "Produtos", href: "/produtos" },
   { label: "Pedidos", href: "/pedidos" },
   { label: "Histórico", href: "/historico" },
   { label: "Sobre", href: "/sobre" },
+  { label: "Testes", href: "/testes" },
 ]
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -35,10 +37,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body>
 
-        <div className="flex p-4">
+        <div className="flex p-4 min-h-screen">
           <Sidebar links={sidebarLinks}
           />
-          <main>{children}</main>
+          <main className="flex-1 p-1">{children}</main>
         </div>
         
       </body>

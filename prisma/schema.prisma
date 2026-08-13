@@ -1,0 +1,57 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Customer {
+  id                String    @id @default(cuid())
+  name              String
+  empresa           String?
+  phone             String?
+  city              String?   
+  createdAt         DateTime  @default(now())
+  orders            Order[]
+}
+
+model Product {
+    id              String  @id @default(cuid())
+    nome            String
+    descricao       String?
+    preco           Decimal
+
+    orderItems OrderItem[]
+}
+
+enum OrderType {
+    PEDIDO
+    ORCAMENTO
+}
+
+model Order {
+    id              String    @id @default(cuid())
+    tipo            OrderType
+    pagamento       String
+    prazoEntrega    DateTime?
+    createdAt       DateTime  @default(now())
+
+    customerId      String
+    customer        Customer  @relation(fields: [customerId],   references: [id])
+
+    items           OrderItem[]
+}
+
+model OrderItem {
+    id              String  @id @default(cuid())
+    quantidade      Int
+    valorUnitario   Decimal
+
+    orderId         String
+    order           Order @relation(fields: [orderId], references: [id])
+
+    productId       String
+    product         Product @relation(fields: [productId],    references: [id])
+}
