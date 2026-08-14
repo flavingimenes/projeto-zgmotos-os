@@ -1,8 +1,22 @@
 import Link from "next/link";
 import { prisma } from "../../src/lib/prisma";
 
-export default async function Clientes() {
-  const clientes = await prisma.customer.findMany();
+export default async function Clientes({
+  searchParams,
+}: {
+  searchParams: Promise<{ busca?: string }>;
+}) {
+  const { busca } = await searchParams;
+
+  const clientes = await prisma.customer.findMany({
+    where: busca
+      ? {
+          name: {
+            contains: busca,
+          },
+        }
+      : undefined,
+  });
 
   return (
     <main className="min-h-screen bg-gray-50 p-6">
@@ -17,11 +31,31 @@ export default async function Clientes() {
           </p>
         </div>
 
+        {/* Busca */}
+        <form className="mb-6 flex gap-2">
+          <input
+            type="text"
+            name="busca"
+            placeholder="Buscar cliente pelo nome..."
+            defaultValue={busca}
+            className="flex-1 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm outline-none text-black"
+          />
+
+          <button
+            type="submit"
+            className="rounded-lg bg-gray-900 px-5 py-2 text-sm text-white"
+          >
+            Buscar
+          </button>
+        </form>
+
         <div className="overflow-hidden rounded-lg border border-gray-200 bg-white">
           {clientes.length === 0 ? (
             <div className="p-8 text-center">
               <p className="text-sm text-gray-500">
-                Nenhum cliente cadastrado.
+                {busca
+                  ? `Nenhum cliente encontrado para "${busca}".`
+                  : "Nenhum cliente cadastrado."}
               </p>
             </div>
           ) : (

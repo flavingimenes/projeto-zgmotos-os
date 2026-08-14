@@ -35,11 +35,18 @@ export default async function Clientes() {
               className="rounded-md border border-gray-300 px-3 py-2 outline-none transition focus:border-gray-500 text-black"
             />
 
-            <input
+            <select
               name="city"
-              placeholder="Cidade (opcional)"
+              defaultValue=""
               className="rounded-md border border-gray-300 px-3 py-2 outline-none transition focus:border-gray-500 text-black"
-            />
+            >
+              <option value="" disabled>
+                Selecione a cidade
+              </option>
+
+              <option value="Várzea Grande">Várzea Grande</option>
+              <option value="Cuiabá">Cuiabá</option>
+            </select>
           </div>
 
           <button

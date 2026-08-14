@@ -19,20 +19,25 @@ export function Sidebar({ links }: SidebarProps) {
     <aside>
       <nav className="flex flex-col gap-4 p-5">
         {links.map((link) => {
-          const isActive =
-            link.href === "/"
+          const isNovo = link.href.endsWith("/novo");
+
+          const isActive = isNovo
+            ? pathname === link.href
+            : link.href === "/"
               ? pathname === "/"
               : pathname === link.href ||
-                pathname.startsWith(`${link.href}/`);
+                (pathname.startsWith(`${link.href}/`) &&
+                  !pathname.endsWith("/novo"));
 
           return (
             <Link
               href={link.href}
               key={link.href}
               className={`rounded-md p-2 ${
-                isActive
-                  ? "bg-blue-500 text-white"
-                  : "text-gray-600 hover:bg-gray-100"
+                isActive && 
+                   isActive
+                    ? "bg-blue-700 text-white"
+                    : "text-gray-600 hover:bg-gray-100"
               }`}
             >
               {link.label}
