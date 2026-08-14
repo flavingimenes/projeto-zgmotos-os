@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { prisma } from "../../src/lib/prisma";
+import formatarTelefone from "@/src/lib/utils/formatarTelefone";
 
 export default async function Clientes({
   searchParams,
@@ -66,15 +67,25 @@ export default async function Clientes({
                     href={`/clientes/${cliente.id}`}
                     className="flex items-center justify-between px-5 py-4 transition-colors hover:bg-gray-50"
                   >
-                    <div>
-                      <p className="font-medium text-gray-900">
-                        {cliente.name}
-                      </p>
+                    <div className="flex items-start justify-between gap-4">
+                <div className="min-w-0">
+                  <p className="font-medium text-gray-900">{cliente.name}</p>
 
-                      <p className="mt-1 text-xs text-gray-400">
-                        #{index + 1}
-                      </p>
-                    </div>
+                  {cliente.empresa && (
+                    <p className="mt-1 text-sm text-gray-500">
+                      {cliente.empresa}
+                    </p>
+                  )}
+
+                  <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-500">
+                    {cliente.phone && (
+                      <span>Telefone: {formatarTelefone(cliente.phone)}</span>
+                    )}
+
+                    {cliente.city && <span>📍 {cliente.city}</span>}
+                  </div>
+                </div>
+              </div>
                   </Link>
                 </li>
               ))}
