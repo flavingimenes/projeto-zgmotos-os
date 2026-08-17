@@ -1,36 +1,34 @@
 "use client";
 
 import { useState } from "react";
-import { deleteProduct } from "../lib/actions/product";
+import { deleteOrder } from "../lib/actions/order";
 
-interface DeleteCustomerButtonProps {
+interface DeleteOrderButtonProps {
   id: string;
   nome: string;
 }
 
-export default function DeleteProductButton({
+export default function DeleteOrderButton({
   id,
   nome,
-}: DeleteCustomerButtonProps) {
+}: DeleteOrderButtonProps) {
   const [open, setOpen] = useState(false);
 
   return (
     <>
-      {/* Botão que abre o modal */}
       <button
         type="button"
         onClick={() => setOpen(true)}
         className="rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700"
       >
-        Excluir produto
+        Excluir Pedido
       </button>
 
-      {/* Modal */}
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
           <div className="w-full max-w-sm rounded-lg bg-white p-6 shadow-xl">
             <h2 className="text-lg font-semibold text-gray-900">
-              Excluir produto
+              Excluir pedido
             </h2>
 
             <p className="mt-2 text-sm text-gray-500">
@@ -50,7 +48,7 @@ export default function DeleteProductButton({
                 Cancelar
               </button>
 
-              <form action={deleteProduct.bind(null, id)}>
+              <form action={deleteOrder.bind(null, id)}>
                 <button
                   type="submit"
                   className="rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700"

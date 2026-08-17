@@ -1,5 +1,6 @@
 import { prisma } from "@/src/lib/prisma";
 import Link from "next/link";
+import DeleteOrderButton from "@/src/components/DeleteOrderButton";
 
 export default async function HistoricoPedidos({
   searchParams,
@@ -241,6 +242,11 @@ export default async function HistoricoPedidos({
                     >
                       Ver pedido
                     </Link>
+
+                    <DeleteOrderButton 
+                      id={pedido.id}
+                      nome={pedido.customer.name}
+                      />
                   </div>
                 );
               })}

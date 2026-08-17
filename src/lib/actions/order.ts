@@ -1,5 +1,6 @@
 "use server";
 import { prisma } from "@/src/lib/prisma";
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 interface CreateOrderInput {
@@ -36,4 +37,15 @@ export async function createOrder(input: CreateOrderInput) {
   });
   
   redirect(`/pedidos`);
+}
+
+
+export async function deleteOrder(id: string) {
+  await prisma.order.delete({
+    where: {
+      id,
+    },
+  });
+
+  revalidatePath("/historicoPedidos");
 }

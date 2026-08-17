@@ -54,11 +54,19 @@ export async function updateCustomer(
 
 
 export async function deleteCustomer(id: string) {
-  await prisma.customer.delete({
-    where: {
-      id,
-    },
-  });
+  try {
+    await prisma.customer.delete({
+      where: {
+        id,
+      },
+    });
+  } catch (error) {
+    return {
+      success: false,
+      error:
+        "Não é possível excluir este cliente porque ele possui pedidos cadastrados.",
+    };
+  }
 
   revalidatePath("/clientes");
   redirect("/clientes");
