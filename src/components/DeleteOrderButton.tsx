@@ -32,7 +32,7 @@ export default function DeleteOrderButton({
             </h2>
 
             <p className="mt-2 text-sm text-gray-500">
-              Tem certeza que deseja excluir{" "}
+              Tem certeza que deseja excluir o pedido de{" "}
               <span className="font-medium text-gray-900">
                 {nome}
               </span>

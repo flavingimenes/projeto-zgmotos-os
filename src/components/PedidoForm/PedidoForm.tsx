@@ -3,11 +3,15 @@
 import { useEffect, useRef, useState } from "react";
 import { createOrder } from "../../lib/actions/order";
 import { criarItem, type Item, type Produto, type Cliente } from "./itens";
+import { useRouter } from "next/navigation";
 
 interface PedidoFormProps {
   clientes: Cliente[];
   produtos: Produto[];
 }
+
+const formatBRL = (valor: number) =>
+  valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 export function PedidoForm({ clientes, produtos }: PedidoFormProps) {
   const [itens, setItens] = useState<Item[]>([]);
@@ -28,6 +32,7 @@ export function PedidoForm({ clientes, produtos }: PedidoFormProps) {
   const [erro, setErro] = useState<string | null>(null);
 
   const comboboxRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   const produtosFiltrados = produtos.filter((produto) =>
     produto.nome.toLowerCase().includes(buscaProduto.trim().toLowerCase()),
@@ -57,16 +62,22 @@ export function PedidoForm({ clientes, produtos }: PedidoFormProps) {
     setItens((itensAtuais) => itensAtuais.filter((item) => item.id !== id));
   }
 
-  function alterarQuantidade(id: string, quantidade: number) {
+  function alterarQuantidade(id: string, novaQuantidade: number) {
+    const quantidadeValida = Math.max(
+      1,
+      Number.isFinite(novaQuantidade) ? novaQuantidade : 1,
+    );
+
     setItens((itensAtuais) =>
       itensAtuais.map((item) =>
-        item.id === id ? { ...item, quantity: quantidade } : item,
+        item.id === id ? { ...item, quantity: quantidadeValida } : item,
       ),
     );
   }
 
   function adicionarItem() {
     if (!produtoSelecionado) return;
+    if (!Number.isFinite(quantidade) || quantidade < 1) return;
 
     const novoItem = criarItem(produtoSelecionado, quantidade);
 
@@ -75,6 +86,17 @@ export function PedidoForm({ clientes, produtos }: PedidoFormProps) {
     setProdutoSelecionado(null);
     setQuantidade(1);
     setBuscaProduto("");
+  }
+
+  function resetarFormulario() {
+    setItens([]);
+    setCustomerId("");
+    setTipo("");
+    setPagamento("");
+    setPrazoEntrega("");
+    setProdutoSelecionado(null);
+    setBuscaProduto("");
+    setQuantidade(1);
   }
 
   const total = itens.reduce(
@@ -119,8 +141,13 @@ export function PedidoForm({ clientes, produtos }: PedidoFormProps) {
           valorUnitario: item.unitPrice,
         })),
       });
-    } catch {
+
+      resetarFormulario();
+      router.refresh();
+    } catch (error) {
+      console.error(error);
       setErro("Não foi possível salvar o pedido. Tente novamente.");
+    } finally {
       setSalvando(false);
     }
   }
@@ -206,7 +233,7 @@ export function PedidoForm({ clientes, produtos }: PedidoFormProps) {
                           >
                             <span className="truncate">{produto.nome}</span>
                             <span className="whitespace-nowrap text-gray-500">
-                              R$ {produto.preco.toFixed(2)}
+                              {formatBRL(produto.preco)}
                             </span>
                           </button>
                         </li>
@@ -225,7 +252,9 @@ export function PedidoForm({ clientes, produtos }: PedidoFormProps) {
                   type="number"
                   min="1"
                   value={quantidade}
-                  onChange={(e) => setQuantidade(Number(e.target.value))}
+                  onChange={(e) =>
+                    setQuantidade(Math.max(1, Number(e.target.value) || 1))
+                  }
                   className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-black"
                 />
               </div>
@@ -265,7 +294,7 @@ export function PedidoForm({ clientes, produtos }: PedidoFormProps) {
                       />
 
                       <span className="whitespace-nowrap text-sm text-gray-700">
-                        R$ {(item.quantity * item.unitPrice).toFixed(2)}
+                        {formatBRL(item.quantity * item.unitPrice)}
                       </span>
 
                       <button
@@ -280,7 +309,7 @@ export function PedidoForm({ clientes, produtos }: PedidoFormProps) {
                 ))}
 
                 <p className="pt-2 text-right text-sm font-semibold text-gray-900">
-                  Total: R$ {total.toFixed(2)}
+                  Total: {formatBRL(total)}
                 </p>
               </div>
             )}

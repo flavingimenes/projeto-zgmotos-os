@@ -40,7 +40,11 @@ export async function createOrder(input: CreateOrderInput) {
     },
   });
 
-  redirect("/pedidos");
+    revalidatePath("/pedidos");
+
+  return {
+    success: true,
+  };
 }
 
 export async function updateOrder(

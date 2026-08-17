@@ -1,43 +1,46 @@
 import { PedidoForm } from "@/src/components/PedidoForm/PedidoForm";
 import { prisma } from "@/src/lib/prisma";
 
+const formatBRL = (valor: number) =>
+  valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
 export default async function Pedidos() {
-  const clientes = await prisma.customer.findMany({
-    select: {
-      id: true,
-      name: true,
-      empresa: true,
-    },
-    orderBy: {
-      name: "asc",
-    },
-  });
-
-  const produtos = await prisma.product.findMany({
-    select: {
-      id: true,
-      nome: true,
-      descricao: true,
-      preco: true,
-    },
-    orderBy: {
-      nome: "asc",
-    },
-  });
-
-  const pedidos = await prisma.order.findMany({
-    include: {
-      customer: true,
-      items: {
-        include: {
-          product: true,
+  const [clientes, produtos, pedidos] = await Promise.all([
+    prisma.customer.findMany({
+      select: {
+        id: true,
+        name: true,
+        empresa: true,
+      },
+      orderBy: {
+        name: "asc",
+      },
+    }),
+    prisma.product.findMany({
+      select: {
+        id: true,
+        nome: true,
+        descricao: true,
+        preco: true,
+      },
+      orderBy: {
+        nome: "asc",
+      },
+    }),
+    prisma.order.findMany({
+      include: {
+        customer: true,
+        items: {
+          include: {
+            product: true,
+          },
         },
       },
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
+      orderBy: {
+        createdAt: "desc",
+      },
+    }),
+  ]);
 
   const produtosFormatados = produtos.map((produto) => ({
     id: produto.id,
@@ -56,15 +59,10 @@ export default async function Pedidos() {
           </p>
         </div>
 
-        <PedidoForm
-          clientes={clientes}
-          produtos={produtosFormatados}
-        />
+        <PedidoForm clientes={clientes} produtos={produtosFormatados} />
 
         <div className="mt-8 mb-3">
-          <h2 className="font-bold text-gray-900">
-            Últimos pedidos feitos:
-          </h2>
+          <h2 className="font-bold text-gray-900">Últimos pedidos feitos:</h2>
         </div>
 
         <div className="space-y-4">
@@ -80,7 +78,6 @@ export default async function Pedidos() {
                 key={pedido.id}
                 className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition hover:shadow-md"
               >
-                {/* Cabeçalho */}
                 <div className="flex flex-col gap-3 border-b border-gray-100 px-5 py-4 md:flex-row md:items-center md:justify-between">
                   <div>
                     <p className="text-lg font-semibold text-gray-900">
@@ -100,15 +97,11 @@ export default async function Pedidos() {
                     </p>
 
                     <p className="text-xl font-bold text-gray-900">
-                      {total.toLocaleString("pt-BR", {
-                        style: "currency",
-                        currency: "BRL",
-                      })}
+                      {formatBRL(total)}
                     </p>
                   </div>
                 </div>
 
-                {/* Informações */}
                 <div className="grid gap-4 px-5 py-5 sm:grid-cols-2 lg:grid-cols-4">
                   <div>
                     <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
@@ -151,7 +144,6 @@ export default async function Pedidos() {
                   </div>
                 </div>
 
-                {/* Produtos */}
                 <div className="border-t border-gray-100 bg-gray-50/70 px-5 py-4">
                   <p className="mb-3 text-sm font-semibold text-gray-900">
                     Produtos
@@ -173,26 +165,22 @@ export default async function Pedidos() {
                         </div>
 
                         <span className="font-medium text-gray-800">
-                          {Number(item.valorUnitario).toLocaleString("pt-BR", {
-                            style: "currency",
-                            currency: "BRL",
-                          })}
+                          {formatBRL(Number(item.valorUnitario))}
                         </span>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                {/* Prazo */}
                 {pedido.prazoEntrega && (
                   <div className="border-t border-gray-100 px-5 py-3">
                     <p className="text-sm text-gray-500">
                       <span className="font-medium text-gray-700">
                         Prazo de entrega:
                       </span>{" "}
-                      {new Date(
-                        pedido.prazoEntrega,
-                      ).toLocaleDateString("pt-BR")}
+                      {new Date(pedido.prazoEntrega).toLocaleDateString(
+                        "pt-BR",
+                      )}
                     </p>
                   </div>
                 )}
