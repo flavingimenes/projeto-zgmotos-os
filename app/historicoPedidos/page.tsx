@@ -94,6 +94,10 @@ export default async function HistoricoPedidos({
           </button>
         </form>
 
+          <h2 className="font-bold text-gray-900 mb-3">
+            Ultimos pedidos feitos:
+          </h2>
+
         <div>
           {pedidos.length === 0 ? (
             <div className="rounded-xl border border-dashed border-gray-300 bg-white p-10 text-center">
@@ -119,10 +123,12 @@ export default async function HistoricoPedidos({
                 );
 
                 return (
+                  
                   <div
                     key={pedido.id}
                     className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition hover:shadow-md"
                   >
+                    
                     <div className="flex flex-col gap-3 border-b border-gray-100 px-5 py-4 md:flex-row md:items-center md:justify-between">
                       <div>
                         <p className="text-lg font-semibold text-gray-900">
@@ -241,6 +247,13 @@ export default async function HistoricoPedidos({
                       className="inline-block m-3 rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 transition hover:border-gray-800 hover:bg-gray-800 hover:text-white"
                     >
                       Ver pedido
+                    </Link>
+
+                    <Link
+                      href={`/historicoPedidos/${pedido.id}/editar`}
+                      className="mt-5 inline-block rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700 mr-4"
+                    >
+                      Editar pedido
                     </Link>
 
                     <DeleteOrderButton 

@@ -42,7 +42,6 @@ export default async function PedidoHistorico({
   return (
     <main className="min-h-screen bg-gray-100 p-4 md:p-8">
       <div className="mx-auto max-w-5xl">
-        {/* Cabeçalho */}
         <div className="mb-6 flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold uppercase text-gray-900">
@@ -57,9 +56,8 @@ export default async function PedidoHistorico({
           <PrintButton />
         </div>
 
-        {/* Ficha */}
+
         <div className="overflow-hidden border-2 border-gray-800 bg-white">
-          {/* Tipo + Data */}
           <div className="grid border-b-2 border-gray-800 md:grid-cols-[1fr_180px]">
             <div className="flex flex-wrap items-center gap-8 p-4">
               <div className="flex items-center gap-2 text-lg font-bold uppercase">
@@ -100,7 +98,6 @@ export default async function PedidoHistorico({
             </div>
           </div>
 
-          {/* Cliente */}
           <div className="border-b-2 border-gray-800 p-4">
             <div className="mb-4">
               <p className="text-xs font-bold uppercase text-gray-500">
@@ -125,7 +122,6 @@ export default async function PedidoHistorico({
             )}
           </div>
 
-          {/* Dados */}
           <div className="grid border-b-2 border-gray-800 sm:grid-cols-2 lg:grid-cols-3">
             <div className="border-b-2 border-gray-800 p-4 sm:border-r-2 lg:border-b-0">
               <p className="text-xs font-bold uppercase text-gray-500">
@@ -162,10 +158,8 @@ export default async function PedidoHistorico({
             </div>
           </div>
 
-          {/* Tabela de produtos */}
           <div className="overflow-x-auto">
             <div className="min-w-162.5">
-              {/* Cabeçalho */}
               <div className="grid grid-cols-[90px_1fr_140px_150px] bg-gray-800 text-white">
                 <div className="border-r border-gray-500 px-3 py-3 text-sm font-bold uppercase">
                   Quant.
@@ -184,7 +178,6 @@ export default async function PedidoHistorico({
                 </div>
               </div>
 
-              {/* Produtos */}
               {pedido.items.map((item) => {
                 const valorUnitario = Number(item.valorUnitario);
                 const subtotal = item.quantidade * valorUnitario;
@@ -213,7 +206,6 @@ export default async function PedidoHistorico({
                 );
               })}
 
-              {/* Linhas vazias */}
               {pedido.items.length < 10 &&
                 Array.from({
                   length: 10 - pedido.items.length,
@@ -231,7 +223,6 @@ export default async function PedidoHistorico({
             </div>
           </div>
 
-          {/* Rodapé */}
           <div className="flex justify-end">
             <div className="flex">
               <div className="bg-gray-800 px-7 py-4 text-base font-bold uppercase text-white">
@@ -244,7 +235,6 @@ export default async function PedidoHistorico({
             </div>
           </div>
 
-          {/* Observação/rodapé */}
           <div className="border-t-2 border-gray-800 p-4">
             <p className="text-sm font-semibold italic text-gray-700">
               Agradecemos a preferência.
@@ -258,7 +248,6 @@ export default async function PedidoHistorico({
         </div>
       </div>
 
-      {/* Estilo de impressão */}
       <style>{`
         @media print {
           body {

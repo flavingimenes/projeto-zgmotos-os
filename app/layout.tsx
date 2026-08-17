@@ -27,7 +27,6 @@ const sidebarLinks = [
   { label: "Novo Pedido", href: "/pedidos" },
   { label: "Histórico De Pedidos", href: "/historicoPedidos" },
   { label: "Sobre", href: "/sobre" },
-  { label: "Testes", href: "/testes" },
 ]
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
