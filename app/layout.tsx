@@ -39,8 +39,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body>
 
         <div className="flex p-4 min-h-screen">
-          <Sidebar links={sidebarLinks}
-          />
+          <div className="sticky top-4 h-fit">
+            <Sidebar links={sidebarLinks}
+            />
+          </div>
           <main className="flex-1 p-1">{children}</main>
         </div>
         
