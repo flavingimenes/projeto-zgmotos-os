@@ -24,8 +24,8 @@ const sidebarLinks = [
   { label: "Novo Cliente", href: "/clientes/novo" },
   { label: "Produtos", href: "/produtos" },
   { label: "Novo Produto", href: "/produtos/novo" },
-  { label: "Pedidos", href: "/pedidos" },
-  { label: "Histórico", href: "/historico" },
+  { label: "Novo Pedido", href: "/pedidos" },
+  { label: "Histórico De Pedidos", href: "/historicoPedidos" },
   { label: "Sobre", href: "/sobre" },
   { label: "Testes", href: "/testes" },
 ]

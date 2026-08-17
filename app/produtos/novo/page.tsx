@@ -73,12 +73,12 @@ export default async function Produtos() {
 
         <div className="mb-3">
           <h2 className="text-lg font-semibold text-gray-900">
-            Produtos cadastrados
+            Ultimos produtos cadastrados:
           </h2>
         </div>
 
         <ul className="space-y-3">
-          {produtos.map((produto) => (
+          {[...produtos].reverse().map((produto) => (
             <li
               key={produto.id}
               className="rounded-lg border border-gray-200 bg-white px-4 py-4 shadow-sm transition hover:shadow-md"

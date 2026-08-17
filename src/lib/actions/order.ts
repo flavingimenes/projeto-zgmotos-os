@@ -35,5 +35,5 @@ export async function createOrder(input: CreateOrderInput) {
     },
   });
   
-  redirect(`/pedidos/${order.id}`);
+  redirect(`/pedidos`);
 }
