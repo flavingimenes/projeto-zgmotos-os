@@ -23,7 +23,12 @@ export function PedidoForm({ clientes, produtos }: PedidoFormProps) {
   const [buscaProduto, setBuscaProduto] = useState("");
   const [listaAberta, setListaAberta] = useState(false);
 
-  const [customerId, setCustomerId] = useState("");
+  const [clienteSelecionado, setClienteSelecionado] = useState<Cliente | null>(
+    null,
+  );
+  const [buscaCliente, setBuscaCliente] = useState("");
+  const [listaClienteAberta, setListaClienteAberta] = useState(false);
+
   const [tipo, setTipo] = useState<"" | "PEDIDO" | "ORCAMENTO">("");
   const [pagamento, setPagamento] = useState("");
   const [prazoEntrega, setPrazoEntrega] = useState("");
@@ -32,11 +37,20 @@ export function PedidoForm({ clientes, produtos }: PedidoFormProps) {
   const [erro, setErro] = useState<string | null>(null);
 
   const comboboxRef = useRef<HTMLDivElement>(null);
+  const comboboxClienteRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
   const produtosFiltrados = produtos.filter((produto) =>
     produto.nome.toLowerCase().includes(buscaProduto.trim().toLowerCase()),
   );
+
+  const clientesFiltrados = clientes.filter((cliente) => {
+    const termo = buscaCliente.trim().toLowerCase();
+    return (
+      cliente.name.toLowerCase().includes(termo) ||
+      (cliente.empresa ?? "").toLowerCase().includes(termo)
+    );
+  });
 
   useEffect(() => {
     function aoClicarFora(evento: MouseEvent) {
@@ -45,6 +59,13 @@ export function PedidoForm({ clientes, produtos }: PedidoFormProps) {
         !comboboxRef.current.contains(evento.target as Node)
       ) {
         setListaAberta(false);
+      }
+
+      if (
+        comboboxClienteRef.current &&
+        !comboboxClienteRef.current.contains(evento.target as Node)
+      ) {
+        setListaClienteAberta(false);
       }
     }
 
@@ -56,6 +77,14 @@ export function PedidoForm({ clientes, produtos }: PedidoFormProps) {
     setProdutoSelecionado(produto);
     setBuscaProduto(produto.nome);
     setListaAberta(false);
+  }
+
+  function selecionarCliente(cliente: Cliente) {
+    setClienteSelecionado(cliente);
+    setBuscaCliente(
+      cliente.empresa ? `${cliente.name} - ${cliente.empresa}` : cliente.name,
+    );
+    setListaClienteAberta(false);
   }
 
   function removerItem(id: string) {
@@ -90,7 +119,8 @@ export function PedidoForm({ clientes, produtos }: PedidoFormProps) {
 
   function resetarFormulario() {
     setItens([]);
-    setCustomerId("");
+    setClienteSelecionado(null);
+    setBuscaCliente("");
     setTipo("");
     setPagamento("");
     setPrazoEntrega("");
@@ -107,7 +137,7 @@ export function PedidoForm({ clientes, produtos }: PedidoFormProps) {
   async function handleSalvar() {
     setErro(null);
 
-    if (!customerId) {
+    if (!clienteSelecionado) {
       setErro("Selecione um cliente.");
       return;
     }
@@ -131,7 +161,7 @@ export function PedidoForm({ clientes, produtos }: PedidoFormProps) {
 
     try {
       await createOrder({
-        customerId,
+        customerId: clienteSelecionado.id,
         tipo,
         pagamento,
         prazoEntrega: prazoEntrega || undefined,
@@ -153,7 +183,7 @@ export function PedidoForm({ clientes, produtos }: PedidoFormProps) {
   }
 
   return (
-    <div className="mx-auto w-full max-w-3xl px-4 sm:px-0">
+    <div className="mx-auto w-full max-w-3xl px-4 sm:px-0 lg:max-w-4xl xl:max-w-5xl 2xl:max-w-6xl">
       <form
         onSubmit={(e) => e.preventDefault()}
         className="mb-8 rounded-lg border border-gray-200 bg-white p-4 shadow-sm sm:p-5"
@@ -164,21 +194,59 @@ export function PedidoForm({ clientes, produtos }: PedidoFormProps) {
               Cliente
             </label>
 
-            <select
-              value={customerId}
-              onChange={(e) => setCustomerId(e.target.value)}
-              required
-              className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-black outline-none transition focus:border-gray-500 focus:ring-2 focus:ring-gray-200"
-            >
-              <option value="">Selecione o cliente</option>
+            <div ref={comboboxClienteRef} className="relative">
+              <input
+                type="text"
+                role="combobox"
+                aria-expanded={listaClienteAberta}
+                aria-controls="lista-clientes"
+                autoComplete="off"
+                value={buscaCliente}
+                onChange={(e) => {
+                  setBuscaCliente(e.target.value);
+                  setClienteSelecionado(null);
+                  setListaClienteAberta(true);
+                }}
+                onFocus={() => setListaClienteAberta(true)}
+                placeholder="Buscar cliente..."
+                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-black outline-none transition focus:border-gray-500 focus:ring-2 focus:ring-gray-200"
+              />
 
-              {clientes.map((cliente) => (
-                <option key={cliente.id} value={cliente.id}>
-                  {cliente.name}
-                  {cliente.empresa ? ` - ${cliente.empresa}` : ""}
-                </option>
-              ))}
-            </select>
+              {listaClienteAberta && (
+                <ul
+                  id="lista-clientes"
+                  role="listbox"
+                  className="absolute z-10 mt-1 max-h-56 w-full overflow-auto rounded-md border border-gray-200 bg-white py-1 shadow-lg"
+                >
+                  {clientesFiltrados.length === 0 ? (
+                    <li className="px-3 py-2 text-sm text-gray-500">
+                      Nenhum cliente encontrado
+                    </li>
+                  ) : (
+                    clientesFiltrados.map((cliente) => (
+                      <li
+                        key={cliente.id}
+                        role="option"
+                        aria-selected={clienteSelecionado?.id === cliente.id}
+                      >
+                        <button
+                          type="button"
+                          onClick={() => selecionarCliente(cliente)}
+                          className="flex w-full items-center justify-between gap-2 px-3 py-2 text-left text-sm text-black hover:bg-gray-100"
+                        >
+                          <span className="truncate">{cliente.name}</span>
+                          {cliente.empresa && (
+                            <span className="whitespace-nowrap text-gray-500">
+                              {cliente.empresa}
+                            </span>
+                          )}
+                        </button>
+                      </li>
+                    ))
+                  )}
+                </ul>
+              )}
+            </div>
           </div>
 
           <div className="border-t border-gray-200 pt-6 sm:col-span-2">
