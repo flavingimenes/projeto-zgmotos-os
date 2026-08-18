@@ -16,7 +16,7 @@ export function Sidebar({ links }: SidebarProps) {
   const pathname = usePathname();
 
   return (
-    <aside>
+    <aside className="print:hidden">
       <nav className="flex flex-col gap-4 p-5">
         {links.map((link) => {
           const isNovo = link.href.endsWith("/novo");

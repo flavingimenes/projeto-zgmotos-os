@@ -1,11 +1,10 @@
 "use client";
 
-export function PrintButton() {
+export function BotaoImprimir() {
   return (
     <button
-      type="button"
       onClick={() => window.print()}
-      className="bg-gray-800 px-5 py-2.5 text-sm font-bold uppercase text-white transition hover:bg-gray-700"
+      className="rounded-md bg-black px-4 py-2 text-white print:hidden"
     >
       Imprimir
     </button>
