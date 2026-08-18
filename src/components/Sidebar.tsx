@@ -1,7 +1,9 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import Logo from "@/assets/Pictures/LogoOficina.png"
 
 interface SidebarLink {
   label: string;
@@ -17,6 +19,13 @@ export function Sidebar({ links }: SidebarProps) {
 
   return (
     <aside className="print:hidden">
+      <Image 
+      className="m-auto"
+      src={Logo}
+      alt="Logo da empresa"
+      width={150}
+      height={100}
+      />
       <nav className="flex flex-col gap-4 p-5">
         {links.map((link) => {
           const isNovo = link.href.endsWith("/novo");
