@@ -34,7 +34,7 @@ Depois, é só abrir [http://localhost:3000](http://localhost:3000) no navegador
 
 ## Documentação completa
 
-O guia de construção do projeto gerado pelo *Claude Code* (passo a passo, módulo por módulo) e a documentação técnica detalhada estão disponíveis neste link:
+O guia de construção do projeto gerado pelo **Claude Code** (passo a passo, módulo por módulo) e a documentação técnica detalhada estão disponíveis neste link:
 
 📄 **[Documentação e guia do projeto](https://drive.google.com/drive/folders/1P884PE3tYyThgT34TMdr7WhxFWAhR7tz?usp=sharing)**
 
