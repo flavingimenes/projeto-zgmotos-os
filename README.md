@@ -2,7 +2,7 @@
 
 Sistema web para gestão de pedidos e orçamentos de uma oficina de motos — cadastro de clientes, motos, produtos/serviços, montagem de pedidos com cálculo automático, histórico com edição/exclusão e impressão da nota.
 
-O projeto nasceu como um estudo prático de **Next.js**, **React**, **TypeScript** e **Prisma** e com à vontade de resolver um problema real, digitalizando a ficha física de pedido que era usada na oficina.
+O projeto nasceu como um estudo prático de **Next.js**, **React**, **TypeScript** e **Prisma** e com à vontade de resolver um problema reall, digitalizando a ficha física de pedido que era usada na oficina.
 
 ## Funcionalidades
 
@@ -34,10 +34,10 @@ Depois, é só abrir [http://localhost:3000](http://localhost:3000) no navegador
 
 ## Documentação completa
 
-O guia de construção do projeto (passo a passo, módulo por módulo) e a documentação técnica detalhada estão disponíveis neste link:
+O guia de construção do projeto gerado pelo *Claude Code* (passo a passo, módulo por módulo) e a documentação técnica detalhada estão disponíveis neste link:
 
 📄 **[Documentação e guia do projeto](https://drive.google.com/drive/folders/1P884PE3tYyThgT34TMdr7WhxFWAhR7tz?usp=sharing)**
 
 ## Status
 
-Projeto pessoal em desenvolvimento contínuo.
+Projeto pessoal em desenvolvimento contínuo, ainda pretendo adicionar mais funcionalidades e modificar a estilização.
