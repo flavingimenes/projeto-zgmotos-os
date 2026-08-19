@@ -8,13 +8,26 @@ datasource db {
 }
 
 model Customer {
-  id                String    @id @default(cuid())
+  id                String       @id @default(cuid())
   name              String
   empresa           String?
   phone             String?
   city              String?   
-  createdAt         DateTime  @default(now())
+  createdAt         DateTime     @default(now())
   orders            Order[]
+  motorcycles       Motorcycle[]
+}
+
+model Motorcycle {
+  id              String   @id @default(cuid())
+  nome            String
+  placa           String
+  createdAt       DateTime @default(now())
+
+  customerId      String
+  customer        Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  orders          Order[]
 }
 
 model Product {
@@ -36,10 +49,14 @@ model Order {
     tipo            OrderType
     pagamento       String
     prazoEntrega    DateTime?
+    observacoes     String?
     createdAt       DateTime  @default(now())
 
     customerId      String
     customer        Customer  @relation(fields: [customerId],   references: [id])
+
+    motorcycleId    String?
+    motorcycle      Motorcycle? @relation(fields: [motorcycleId], references: [id])
 
     items           OrderItem[]
 }

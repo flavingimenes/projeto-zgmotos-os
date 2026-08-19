@@ -17,6 +17,9 @@ export default async function Clientes({
           },
         }
       : undefined,
+    include: {
+      motorcycles: true,
+    },
     orderBy: {
       name: "asc",
     },
@@ -122,6 +125,29 @@ export default async function Clientes({
                       {cliente.city || "Não informado"}
                     </p>
                   </div>
+                </div>
+
+                <div className="border-t border-gray-100 px-5 py-4">
+                  <p className="mb-2 text-xs font-medium uppercase tracking-wide text-gray-400">
+                    Motos
+                  </p>
+
+                  {cliente.motorcycles.length === 0 ? (
+                    <p className="text-sm text-gray-500">
+                      Nenhuma moto cadastrada
+                    </p>
+                  ) : (
+                    <div className="space-y-1">
+                      {cliente.motorcycles.map((moto) => (
+                        <p
+                          key={moto.id}
+                          className="text-sm font-medium text-gray-800"
+                        >
+                          {moto.nome} - {moto.placa}
+                        </p>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 <div className="border-t border-gray-100 bg-gray-50/70 px-5 py-3">

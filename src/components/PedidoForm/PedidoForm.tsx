@@ -28,10 +28,12 @@ export function PedidoForm({ clientes, produtos }: PedidoFormProps) {
   );
   const [buscaCliente, setBuscaCliente] = useState("");
   const [listaClienteAberta, setListaClienteAberta] = useState(false);
+  const [motoId, setMotoId] = useState("");
 
   const [tipo, setTipo] = useState<"" | "PEDIDO" | "ORCAMENTO">("");
   const [pagamento, setPagamento] = useState("");
   const [prazoEntrega, setPrazoEntrega] = useState("");
+  const [observacoes, setObservacoes] = useState("");
 
   const [salvando, setSalvando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
@@ -85,6 +87,7 @@ export function PedidoForm({ clientes, produtos }: PedidoFormProps) {
       cliente.empresa ? `${cliente.name} - ${cliente.empresa}` : cliente.name,
     );
     setListaClienteAberta(false);
+    setMotoId("");
   }
 
   function removerItem(id: string) {
@@ -121,9 +124,11 @@ export function PedidoForm({ clientes, produtos }: PedidoFormProps) {
     setItens([]);
     setClienteSelecionado(null);
     setBuscaCliente("");
+    setMotoId("");
     setTipo("");
     setPagamento("");
     setPrazoEntrega("");
+    setObservacoes("");
     setProdutoSelecionado(null);
     setBuscaProduto("");
     setQuantidade(1);
@@ -162,9 +167,11 @@ export function PedidoForm({ clientes, produtos }: PedidoFormProps) {
     try {
       await createOrder({
         customerId: clienteSelecionado.id,
+        motorcycleId: motoId || undefined,
         tipo,
         pagamento,
         prazoEntrega: prazoEntrega || undefined,
+        observacoes: observacoes || undefined,
         items: itens.map((item) => ({
           productId: item.productId,
           quantidade: item.quantity,
@@ -205,6 +212,7 @@ export function PedidoForm({ clientes, produtos }: PedidoFormProps) {
                 onChange={(e) => {
                   setBuscaCliente(e.target.value);
                   setClienteSelecionado(null);
+                  setMotoId("");
                   setListaClienteAberta(true);
                 }}
                 onFocus={() => setListaClienteAberta(true)}
@@ -248,6 +256,30 @@ export function PedidoForm({ clientes, produtos }: PedidoFormProps) {
               )}
             </div>
           </div>
+
+          {clienteSelecionado && clienteSelecionado.motorcycles.length > 0 && (
+            <div className="sm:col-span-2">
+              <label className="mb-1 block text-sm font-medium text-gray-700">
+                Moto do cliente
+                <span className="ml-1 font-normal text-gray-400">
+                  (opcional)
+                </span>
+              </label>
+
+              <select
+                value={motoId}
+                onChange={(e) => setMotoId(e.target.value)}
+                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-black outline-none focus:border-gray-500"
+              >
+                <option value="">Nenhuma</option>
+                {clienteSelecionado.motorcycles.map((moto) => (
+                  <option key={moto.id} value={moto.id}>
+                    {moto.nome} - {moto.placa}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           <div className="border-t border-gray-200 pt-6 sm:col-span-2">
             <h2 className="mb-4 text-lg font-semibold text-gray-900">
@@ -435,6 +467,23 @@ export function PedidoForm({ clientes, produtos }: PedidoFormProps) {
                 className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-black"
               />
             </div>
+          </div>
+
+          <div className="sm:col-span-2">
+            <label className="mb-1 block text-sm font-medium text-gray-700">
+              Observações
+              <span className="ml-1 font-normal text-gray-400">
+                (opcional)
+              </span>
+            </label>
+
+            <textarea
+              value={observacoes}
+              onChange={(e) => setObservacoes(e.target.value)}
+              rows={3}
+              placeholder="Alguma observação sobre o pedido..."
+              className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-black outline-none transition placeholder:text-gray-400 focus:border-gray-500 focus:ring-2 focus:ring-gray-200"
+            />
           </div>
         </div>
 

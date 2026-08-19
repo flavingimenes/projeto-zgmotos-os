@@ -45,6 +45,7 @@ export default async function HistoricoPedidos({
 
     include: {
       customer: true,
+      motorcycle: true,
       items: {
         include: {
           product: true,
@@ -138,6 +139,13 @@ export default async function HistoricoPedidos({
                         {pedido.customer.empresa && (
                           <p className="text-sm text-gray-500">
                             {pedido.customer.empresa}
+                          </p>
+                        )}
+
+                        {pedido.motorcycle && (
+                          <p className="text-sm text-gray-500">
+                            Moto: {pedido.motorcycle.nome} -{" "}
+                            {pedido.motorcycle.placa}
                           </p>
                         )}
                       </div>
@@ -238,6 +246,17 @@ export default async function HistoricoPedidos({
                           {new Date(
                             pedido.prazoEntrega,
                           ).toLocaleDateString("pt-BR")}
+                        </p>
+                      </div>
+                    )}
+
+                    {pedido.observacoes && (
+                      <div className="border-t border-gray-100 px-5 py-3">
+                        <p className="text-sm text-gray-500">
+                          <span className="font-medium text-gray-700">
+                            Observações:
+                          </span>{" "}
+                          {pedido.observacoes}
                         </p>
                       </div>
                     )}

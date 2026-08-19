@@ -6,9 +6,11 @@ import { redirect } from "next/navigation";
 
 interface CreateOrderInput {
   customerId: string;
+  motorcycleId?: string;
   tipo: "PEDIDO" | "ORCAMENTO";
   pagamento: string;
   prazoEntrega?: string;
+  observacoes?: string;
   items: {
     productId: string;
     quantidade: number;
@@ -24,11 +26,13 @@ export async function createOrder(input: CreateOrderInput) {
   await prisma.order.create({
     data: {
       customerId: input.customerId,
+      motorcycleId: input.motorcycleId || null,
       tipo: input.tipo,
       pagamento: input.pagamento,
       prazoEntrega: input.prazoEntrega
         ? new Date(input.prazoEntrega)
         : null,
+      observacoes: input.observacoes || null,
 
       items: {
         create: input.items.map((item) => ({
@@ -57,6 +61,8 @@ export async function updateOrder(
 
   const prazoEntrega = formData.get("prazoEntrega");
 
+  const observacoes = formData.get("observacoes");
+
   const productIds = formData.getAll("productId");
 
   const quantidades = formData.getAll("quantidade");
@@ -76,6 +82,10 @@ export async function updateOrder(
 
   if (typeof prazoEntrega !== "string") {
     throw new Error("Prazo de entrega inválido.");
+  }
+
+  if (typeof observacoes !== "string") {
+    throw new Error("Observações inválidas.");
   }
 
   if (productIds.length === 0) {
@@ -125,6 +135,7 @@ export async function updateOrder(
         prazoEntrega: prazoEntrega
           ? new Date(prazoEntrega)
           : null,
+        observacoes: observacoes || null,
       },
     });
 

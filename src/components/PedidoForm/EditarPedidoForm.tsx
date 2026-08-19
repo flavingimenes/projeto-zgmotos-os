@@ -1,203 +1,440 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import { updateOrder } from "@/src/lib/actions/order";
+import { useEffect, useRef, useState } from "react";
+import { createOrder } from "../../lib/actions/order";
+import { criarItem, type Item, type Produto, type Cliente } from "./itens";
+import { useRouter } from "next/navigation";
 
-interface Produto {
-  id: string;
-  nome: string;
-  preco: number;
-}
-
-interface ItemPedido {
-  id: string;
-  productId: string;
-  productNome: string;
-  quantidade: number;
-  valorUnitario: number;
-}
-
-interface Pedido {
-  id: string;
-  tipo: "PEDIDO" | "ORCAMENTO";
-  pagamento: string;
-  prazoEntrega: string;
-  customer: {
-    name: string;
-    empresa: string | null;
-  };
-  items: ItemPedido[];
-}
-
-interface EditarPedidoFormProps {
-  pedido: Pedido;
+interface PedidoFormProps {
+  clientes: Cliente[];
   produtos: Produto[];
 }
 
-export default function EditarPedidoForm({
-  pedido,
-  produtos,
-}: EditarPedidoFormProps) {
-  const [items, setItems] = useState<ItemPedido[]>(pedido.items);
+const formatBRL = (valor: number) =>
+  valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
+export function PedidoForm({ clientes, produtos }: PedidoFormProps) {
+  const [itens, setItens] = useState<Item[]>([]);
+
+  const [produtoSelecionado, setProdutoSelecionado] = useState<Produto | null>(
+    null,
+  );
+  const [quantidade, setQuantidade] = useState(1);
   const [buscaProduto, setBuscaProduto] = useState("");
   const [listaAberta, setListaAberta] = useState(false);
 
+  const [clienteSelecionado, setClienteSelecionado] = useState<Cliente | null>(
+    null,
+  );
+  const [buscaCliente, setBuscaCliente] = useState("");
+  const [listaClienteAberta, setListaClienteAberta] = useState(false);
+  const [motoId, setMotoId] = useState("");
+
+  const [tipo, setTipo] = useState<"" | "PEDIDO" | "ORCAMENTO">("");
+  const [pagamento, setPagamento] = useState("");
+  const [prazoEntrega, setPrazoEntrega] = useState("");
+  const [observacoes, setObservacoes] = useState("");
+
+  const [salvando, setSalvando] = useState(false);
+  const [erro, setErro] = useState<string | null>(null);
+
   const comboboxRef = useRef<HTMLDivElement>(null);
+  const comboboxClienteRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
-  const produtosFiltrados = useMemo(() => {
-    const busca = buscaProduto.trim().toLowerCase();
+  const produtosFiltrados = produtos.filter((produto) =>
+    produto.nome.toLowerCase().includes(buscaProduto.trim().toLowerCase()),
+  );
 
-    if (!busca) {
-      return produtos;
-    }
-
-    return produtos.filter((produto) =>
-      produto.nome.toLowerCase().includes(busca),
+  const clientesFiltrados = clientes.filter((cliente) => {
+    const termo = buscaCliente.trim().toLowerCase();
+    return (
+      cliente.name.toLowerCase().includes(termo) ||
+      (cliente.empresa ?? "").toLowerCase().includes(termo)
     );
-  }, [buscaProduto, produtos]);
+  });
 
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
+    function aoClicarFora(evento: MouseEvent) {
       if (
         comboboxRef.current &&
-        !comboboxRef.current.contains(event.target as Node)
+        !comboboxRef.current.contains(evento.target as Node)
       ) {
         setListaAberta(false);
       }
+
+      if (
+        comboboxClienteRef.current &&
+        !comboboxClienteRef.current.contains(evento.target as Node)
+      ) {
+        setListaClienteAberta(false);
+      }
     }
 
-    document.addEventListener("mousedown", handleClickOutside);
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    document.addEventListener("mousedown", aoClicarFora);
+    return () => document.removeEventListener("mousedown", aoClicarFora);
   }, []);
 
   function selecionarProduto(produto: Produto) {
-    setItems((current) => [
-      ...current,
-      {
-        id: crypto.randomUUID(),
-        productId: produto.id,
-        productNome: produto.nome,
-        quantidade: 1,
-        valorUnitario: produto.preco,
-      },
-    ]);
-
-    setBuscaProduto("");
+    setProdutoSelecionado(produto);
+    setBuscaProduto(produto.nome);
     setListaAberta(false);
   }
 
-  function removerProduto(id: string) {
-    setItems((current) =>
-      current.filter((item) => item.id !== id),
+  function selecionarCliente(cliente: Cliente) {
+    setClienteSelecionado(cliente);
+    setBuscaCliente(
+      cliente.empresa ? `${cliente.name} - ${cliente.empresa}` : cliente.name,
     );
+    setListaClienteAberta(false);
+    setMotoId("");
   }
 
-  function alterarProduto(id: string, productId: string) {
-    const produto = produtos.find(
-      (produto) => produto.id === productId,
+  function removerItem(id: string) {
+    setItens((itensAtuais) => itensAtuais.filter((item) => item.id !== id));
+  }
+
+  function alterarQuantidade(id: string, novaQuantidade: number) {
+    const quantidadeValida = Math.max(
+      1,
+      Number.isFinite(novaQuantidade) ? novaQuantidade : 1,
     );
 
-    if (!produto) {
-      return;
-    }
-
-    setItems((current) =>
-      current.map((item) =>
-        item.id === id
-          ? {
-              ...item,
-              productId: produto.id,
-              productNome: produto.nome,
-              valorUnitario: produto.preco,
-            }
-          : item,
+    setItens((itensAtuais) =>
+      itensAtuais.map((item) =>
+        item.id === id ? { ...item, quantity: quantidadeValida } : item,
       ),
     );
   }
 
-  function alterarQuantidade(
-    id: string,
-    quantidade: number,
-  ) {
-    setItems((current) =>
-      current.map((item) =>
-        item.id === id
-          ? {
-              ...item,
-              quantidade,
-            }
-          : item,
-      ),
-    );
+  function adicionarItem() {
+    if (!produtoSelecionado) return;
+    if (!Number.isFinite(quantidade) || quantidade < 1) return;
+
+    const novoItem = criarItem(produtoSelecionado, quantidade);
+
+    setItens((itensAtuais) => [...itensAtuais, novoItem]);
+
+    setProdutoSelecionado(null);
+    setQuantidade(1);
+    setBuscaProduto("");
   }
 
-  function alterarValor(
-    id: string,
-    valorUnitario: number,
-  ) {
-    setItems((current) =>
-      current.map((item) =>
-        item.id === id
-          ? {
-              ...item,
-              valorUnitario,
-            }
-          : item,
-      ),
-    );
+  function resetarFormulario() {
+    setItens([]);
+    setClienteSelecionado(null);
+    setBuscaCliente("");
+    setMotoId("");
+    setTipo("");
+    setPagamento("");
+    setPrazoEntrega("");
+    setObservacoes("");
+    setProdutoSelecionado(null);
+    setBuscaProduto("");
+    setQuantidade(1);
   }
 
-  const total = items.reduce(
-    (acc, item) =>
-      acc + item.quantidade * item.valorUnitario,
+  const total = itens.reduce(
+    (soma, item) => soma + item.quantity * item.unitPrice,
     0,
   );
 
+  async function handleSalvar() {
+    setErro(null);
+
+    if (!clienteSelecionado) {
+      setErro("Selecione um cliente.");
+      return;
+    }
+
+    if (!tipo) {
+      setErro("Selecione o tipo do pedido.");
+      return;
+    }
+
+    if (!pagamento) {
+      setErro("Selecione a condição de pagamento.");
+      return;
+    }
+
+    if (itens.length === 0) {
+      setErro("Adicione ao menos um item ao pedido.");
+      return;
+    }
+
+    setSalvando(true);
+
+    try {
+      await createOrder({
+        customerId: clienteSelecionado.id,
+        motorcycleId: motoId || undefined,
+        tipo,
+        pagamento,
+        prazoEntrega: prazoEntrega || undefined,
+        observacoes: observacoes || undefined,
+        items: itens.map((item) => ({
+          productId: item.productId,
+          quantidade: item.quantity,
+          valorUnitario: item.unitPrice,
+        })),
+      });
+
+      resetarFormulario();
+      router.refresh();
+    } catch (error) {
+      console.error(error);
+      setErro("Não foi possível salvar o pedido. Tente novamente.");
+    } finally {
+      setSalvando(false);
+    }
+  }
+
   return (
-    <main className="min-h-screen bg-gray-50 p-6">
-      <div className="mx-auto max-w-3xl">
-        <h1 className="text-2xl font-semibold text-gray-900">
-          Editar pedido
-        </h1>
+    <div className="mx-auto w-full max-w-3xl px-4 sm:px-0 lg:max-w-4xl xl:max-w-5xl 2xl:max-w-6xl">
+      <form
+        onSubmit={(e) => e.preventDefault()}
+        className="mb-8 rounded-lg border border-gray-200 bg-white p-4 shadow-sm sm:p-5"
+      >
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="sm:col-span-2">
+            <label className="mb-1 block text-sm font-medium text-gray-700">
+              Cliente
+            </label>
 
-        <p className="mt-1 text-sm text-gray-500">
-          Altere os dados e os produtos do pedido.
-        </p>
+            <div ref={comboboxClienteRef} className="relative">
+              <input
+                type="text"
+                role="combobox"
+                aria-expanded={listaClienteAberta}
+                aria-controls="lista-clientes"
+                autoComplete="off"
+                value={buscaCliente}
+                onChange={(e) => {
+                  setBuscaCliente(e.target.value);
+                  setClienteSelecionado(null);
+                  setMotoId("");
+                  setListaClienteAberta(true);
+                }}
+                onFocus={() => setListaClienteAberta(true)}
+                placeholder="Buscar cliente..."
+                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-black outline-none transition focus:border-gray-500 focus:ring-2 focus:ring-gray-200"
+              />
 
-        <form
-          action={updateOrder.bind(null, pedido.id)}
-          className="mt-6 rounded-lg border border-gray-200 bg-white p-5"
-        >
-          <div className="space-y-5">
-            <div>
+              {listaClienteAberta && (
+                <ul
+                  id="lista-clientes"
+                  role="listbox"
+                  className="absolute z-10 mt-1 max-h-56 w-full overflow-auto rounded-md border border-gray-200 bg-white py-1 shadow-lg"
+                >
+                  {clientesFiltrados.length === 0 ? (
+                    <li className="px-3 py-2 text-sm text-gray-500">
+                      Nenhum cliente encontrado
+                    </li>
+                  ) : (
+                    clientesFiltrados.map((cliente) => (
+                      <li
+                        key={cliente.id}
+                        role="option"
+                        aria-selected={clienteSelecionado?.id === cliente.id}
+                      >
+                        <button
+                          type="button"
+                          onClick={() => selecionarCliente(cliente)}
+                          className="flex w-full items-center justify-between gap-2 px-3 py-2 text-left text-sm text-black hover:bg-gray-100"
+                        >
+                          <span className="truncate">{cliente.name}</span>
+                          {cliente.empresa && (
+                            <span className="whitespace-nowrap text-gray-500">
+                              {cliente.empresa}
+                            </span>
+                          )}
+                        </button>
+                      </li>
+                    ))
+                  )}
+                </ul>
+              )}
+            </div>
+          </div>
+
+          {clienteSelecionado && clienteSelecionado.motorcycles.length > 0 && (
+            <div className="sm:col-span-2">
               <label className="mb-1 block text-sm font-medium text-gray-700">
-                Cliente
+                Moto do cliente
+                <span className="ml-1 font-normal text-gray-400">
+                  (opcional)
+                </span>
               </label>
 
-              <input
-                value={pedido.customer.name}
-                disabled
-                className="w-full rounded-md border border-gray-300 bg-gray-100 px-3 py-2 text-gray-600 outline-none"
-              />
+              <select
+                value={motoId}
+                onChange={(e) => setMotoId(e.target.value)}
+                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-black outline-none focus:border-gray-500"
+              >
+                <option value="">Nenhuma</option>
+                {clienteSelecionado.motorcycles.map((moto) => (
+                  <option key={moto.id} value={moto.id}>
+                    {moto.nome} - {moto.placa}
+                  </option>
+                ))}
+              </select>
             </div>
+          )}
 
-            {pedido.customer.empresa && (
-              <div>
+          <div className="border-t border-gray-200 pt-6 sm:col-span-2">
+            <h2 className="mb-4 text-lg font-semibold text-gray-900">
+              Itens do pedido
+            </h2>
+
+            <div className="grid gap-4 sm:grid-cols-[1fr_120px_auto]">
+              <div ref={comboboxRef} className="relative">
                 <label className="mb-1 block text-sm font-medium text-gray-700">
-                  Empresa
+                  Produto
                 </label>
 
                 <input
-                  value={pedido.customer.empresa}
-                  disabled
-                  className="w-full rounded-md border border-gray-300 bg-gray-100 px-3 py-2 text-gray-600 outline-none"
+                  type="text"
+                  role="combobox"
+                  aria-expanded={listaAberta}
+                  aria-controls="lista-produtos"
+                  autoComplete="off"
+                  value={buscaProduto}
+                  onChange={(e) => {
+                    setBuscaProduto(e.target.value);
+                    setProdutoSelecionado(null);
+                    setListaAberta(true);
+                  }}
+                  onFocus={() => setListaAberta(true)}
+                  placeholder="Buscar produto..."
+                  className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-black outline-none transition focus:border-gray-500 focus:ring-2 focus:ring-gray-200"
+                />
+
+                {listaAberta && (
+                  <ul
+                    id="lista-produtos"
+                    role="listbox"
+                    className="absolute z-10 mt-1 max-h-56 w-full overflow-auto rounded-md border border-gray-200 bg-white py-1 shadow-lg"
+                  >
+                    {produtosFiltrados.length === 0 ? (
+                      <li className="px-3 py-2 text-sm text-gray-500">
+                        Nenhum produto encontrado
+                      </li>
+                    ) : (
+                      produtosFiltrados.map((produto) => (
+                        <li
+                          key={produto.id}
+                          role="option"
+                          aria-selected={produtoSelecionado?.id === produto.id}
+                        >
+                          <button
+                            type="button"
+                            onClick={() => selecionarProduto(produto)}
+                            className="flex w-full items-center justify-between gap-2 px-3 py-2 text-left text-sm text-black hover:bg-gray-100"
+                          >
+                            <span className="truncate">{produto.nome}</span>
+                            <span className="whitespace-nowrap text-gray-500">
+                              {formatBRL(produto.preco)}
+                            </span>
+                          </button>
+                        </li>
+                      ))
+                    )}
+                  </ul>
+                )}
+              </div>
+
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-700">
+                  Quantidade
+                </label>
+
+                <input
+                  type="number"
+                  min="1"
+                  value={quantidade}
+                  onChange={(e) =>
+                    setQuantidade(Math.max(1, Number(e.target.value) || 1))
+                  }
+                  className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-black"
                 />
               </div>
+
+              <div className="flex items-end">
+                <button
+                  type="button"
+                  onClick={adicionarItem}
+                  disabled={!produtoSelecionado}
+                  className="w-full rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700 disabled:cursor-not-allowed disabled:bg-gray-300 sm:w-auto"
+                >
+                  Adicionar item
+                </button>
+              </div>
+            </div>
+
+            {itens.length > 0 && (
+              <div className="mt-4 space-y-2">
+                {itens.map((item) => (
+                  <div
+                    key={item.id}
+                    className="flex flex-col gap-2 rounded-md border p-3 sm:flex-row sm:items-center sm:justify-between sm:gap-3"
+                  >
+                    <span className="min-w-0 truncate font-medium text-gray-800">
+                      {item.productName}
+                    </span>
+
+                    <div className="flex items-center justify-between gap-3 sm:justify-end">
+                      <input
+                        type="number"
+                        min="1"
+                        value={item.quantity}
+                        onChange={(e) =>
+                          alterarQuantidade(item.id, Number(e.target.value))
+                        }
+                        className="w-20 rounded-md border border-gray-300 px-2 py-1 text-black"
+                      />
+
+                      <span className="whitespace-nowrap text-sm text-gray-700">
+                        {formatBRL(item.quantity * item.unitPrice)}
+                      </span>
+
+                      <button
+                        type="button"
+                        onClick={() => removerItem(item.id)}
+                        className="text-sm font-medium text-red-600 hover:text-red-700"
+                      >
+                        Remover
+                      </button>
+                    </div>
+                  </div>
+                ))}
+
+                <p className="pt-2 text-right text-sm font-semibold text-gray-900">
+                  Total: {formatBRL(total)}
+                </p>
+              </div>
             )}
+          </div>
+
+          <div className="grid gap-4 sm:col-span-2 sm:grid-cols-3">
+            <div>
+              <label className="mb-1 block text-sm font-medium text-gray-700">
+                Condição de pagamento
+              </label>
+
+              <select
+                value={pagamento}
+                onChange={(e) => setPagamento(e.target.value)}
+                required
+                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-black"
+              >
+                <option value="">Selecione</option>
+                <option value="A_VISTA">À vista</option>
+                <option value="PIX">Pix</option>
+                <option value="CARTAO">Cartão</option>
+                <option value="BOLETO">Boleto</option>
+                <option value="PARCELADO">Parcelado</option>
+              </select>
+            </div>
 
             <div>
               <label className="mb-1 block text-sm font-medium text-gray-700">
@@ -205,27 +442,17 @@ export default function EditarPedidoForm({
               </label>
 
               <select
-                name="tipo"
-                defaultValue={pedido.tipo}
+                value={tipo}
+                onChange={(e) =>
+                  setTipo(e.target.value as "" | "PEDIDO" | "ORCAMENTO")
+                }
                 required
-                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-black outline-none focus:border-gray-500"
+                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-black"
               >
+                <option value="">Selecione</option>
                 <option value="PEDIDO">Pedido</option>
                 <option value="ORCAMENTO">Orçamento</option>
               </select>
-            </div>
-
-            <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">
-                Pagamento
-              </label>
-
-              <input
-                name="pagamento"
-                defaultValue={pedido.pagamento}
-                required
-                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-black outline-none focus:border-gray-500"
-              />
             </div>
 
             <div>
@@ -235,235 +462,44 @@ export default function EditarPedidoForm({
 
               <input
                 type="date"
-                name="prazoEntrega"
-                defaultValue={pedido.prazoEntrega}
-                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-black outline-none focus:border-gray-500"
+                value={prazoEntrega}
+                onChange={(e) => setPrazoEntrega(e.target.value)}
+                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-black"
               />
-            </div>
-
-            <div ref={comboboxRef} className="relative">
-              <label className="mb-1 block text-sm font-medium text-gray-700">
-                Adicionar produto
-              </label>
-
-              <input
-                type="text"
-                role="combobox"
-                aria-expanded={listaAberta}
-                aria-controls="lista-produtos"
-                autoComplete="off"
-                value={buscaProduto}
-                onChange={(e) => {
-                  setBuscaProduto(e.target.value);
-                  setListaAberta(true);
-                }}
-                onFocus={() => setListaAberta(true)}
-                placeholder="Buscar produto..."
-                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-black outline-none transition focus:border-gray-500 focus:ring-2 focus:ring-gray-200"
-              />
-
-              {listaAberta && (
-                <ul
-                  id="lista-produtos"
-                  role="listbox"
-                  className="absolute z-10 mt-1 max-h-56 w-full overflow-auto rounded-md border border-gray-200 bg-white py-1 shadow-lg"
-                >
-                  {produtosFiltrados.length === 0 ? (
-                    <li className="px-3 py-2 text-sm text-gray-500">
-                      Nenhum produto encontrado
-                    </li>
-                  ) : (
-                    produtosFiltrados.map((produto) => (
-                      <li
-                        key={produto.id}
-                        role="option"
-                      >
-                        <button
-                          type="button"
-                          onClick={() =>
-                            selecionarProduto(produto)
-                          }
-                          className="flex w-full items-center justify-between gap-2 px-3 py-2 text-left text-sm text-black hover:bg-gray-100"
-                        >
-                          <span className="truncate">
-                            {produto.nome}
-                          </span>
-
-                          <span className="whitespace-nowrap text-gray-500">
-                            {produto.preco.toLocaleString(
-                              "pt-BR",
-                              {
-                                style: "currency",
-                                currency: "BRL",
-                              },
-                            )}
-                          </span>
-                        </button>
-                      </li>
-                    ))
-                  )}
-                </ul>
-              )}
-            </div>
-
-            <div>
-              <div className="mb-3 flex items-center justify-between">
-                <label className="text-sm font-medium text-gray-700">
-                  Produtos do pedido
-                </label>
-
-                <span className="text-xs text-gray-500">
-                  {items.length}{" "}
-                  {items.length === 1
-                    ? "produto"
-                    : "produtos"}
-                </span>
-              </div>
-
-              {items.length === 0 ? (
-                <div className="rounded-lg border border-dashed border-gray-300 bg-gray-50 p-6 text-center">
-                  <p className="text-sm text-gray-500">
-                    Nenhum produto adicionado ao pedido.
-                  </p>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {items.map((item) => (
-                    <div
-                      key={item.id}
-                      className="rounded-lg border border-gray-200 bg-gray-50 p-4"
-                    >
-                      <div className="grid gap-3 md:grid-cols-[1fr_100px_140px_auto]">
-                        <div>
-                          <label className="mb-1 block text-xs font-medium text-gray-500">
-                            Produto
-                          </label>
-
-                          <select
-                            name="productId"
-                            value={item.productId}
-                            onChange={(e) =>
-                              alterarProduto(
-                                item.id,
-                                e.target.value,
-                              )
-                            }
-                            required
-                            className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-black outline-none focus:border-gray-500"
-                          >
-                            {produtos.map((produto) => (
-                              <option
-                                key={produto.id}
-                                value={produto.id}
-                              >
-                                {produto.nome}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-
-                        <div>
-                          <label className="mb-1 block text-xs font-medium text-gray-500">
-                            Quantidade
-                          </label>
-
-                          <input
-                            type="number"
-                            name="quantidade"
-                            min="1"
-                            value={item.quantidade}
-                            onChange={(e) =>
-                              alterarQuantidade(
-                                item.id,
-                                Number(e.target.value),
-                              )
-                            }
-                            required
-                            className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-black outline-none focus:border-gray-500"
-                          />
-                        </div>
-
-                        <div>
-                          <label className="mb-1 block text-xs font-medium text-gray-500">
-                            Valor unitário
-                          </label>
-
-                          <input
-                            type="number"
-                            name="valorUnitario"
-                            min="0"
-                            step="0.01"
-                            value={item.valorUnitario}
-                            onChange={(e) =>
-                              alterarValor(
-                                item.id,
-                                Number(e.target.value),
-                              )
-                            }
-                            required
-                            className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-black outline-none focus:border-gray-500"
-                          />
-                        </div>
-
-                        <div className="flex items-end">
-                          <button
-                            type="button"
-                            onClick={() =>
-                              removerProduto(item.id)
-                            }
-                            className="w-full rounded-md border border-red-200 px-3 py-2 text-sm font-medium text-red-600 transition hover:bg-red-50 md:w-auto"
-                          >
-                            Remover
-                          </button>
-                        </div>
-                      </div>
-
-                      <div className="mt-3 border-t border-gray-200 pt-3 text-right">
-                        <span className="text-xs text-gray-500">
-                          Subtotal:{" "}
-                        </span>
-
-                        <span className="font-semibold text-gray-800">
-                          {(
-                            item.quantidade *
-                            item.valorUnitario
-                          ).toLocaleString("pt-BR", {
-                            style: "currency",
-                            currency: "BRL",
-                          })}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-gray-600">
-                  Total do pedido
-                </span>
-
-                <span className="text-xl font-bold text-gray-900">
-                  {total.toLocaleString("pt-BR", {
-                    style: "currency",
-                    currency: "BRL",
-                  })}
-                </span>
-              </div>
             </div>
           </div>
 
-          <button
-            type="submit"
-            disabled={items.length === 0}
-            className="mt-5 w-full rounded-md bg-gray-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-700 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            Salvar alterações
-          </button>
-        </form>
-      </div>
-    </main>
+          <div className="sm:col-span-2">
+            <label className="mb-1 block text-sm font-medium text-gray-700">
+              Observações
+              <span className="ml-1 font-normal text-gray-400">
+                (opcional)
+              </span>
+            </label>
+
+            <textarea
+              value={observacoes}
+              onChange={(e) => setObservacoes(e.target.value)}
+              rows={3}
+              placeholder="Alguma observação sobre o pedido..."
+              className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-black outline-none transition placeholder:text-gray-400 focus:border-gray-500 focus:ring-2 focus:ring-gray-200"
+            />
+          </div>
+        </div>
+
+        {erro && (
+          <p className="mt-4 text-sm font-medium text-red-600">{erro}</p>
+        )}
+
+        <button
+          type="button"
+          onClick={handleSalvar}
+          disabled={salvando}
+          className="mt-5 w-full rounded-md bg-gray-900 px-5 py-2 text-sm font-medium text-white transition hover:bg-gray-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-gray-400 sm:w-auto"
+        >
+          {salvando ? "Salvando..." : "Salvar"}
+        </button>
+      </form>
+    </div>
   );
 }

@@ -6,10 +6,17 @@ export interface Item {
   unitPrice: number;
 }
 
+export interface Moto {
+  id: string;
+  nome: string;
+  placa: string;
+}
+
 export interface Cliente {
   id: string;
   name: string;
   empresa: string | null;
+  motorcycles: Moto[];
 }
 
 export interface Produto {

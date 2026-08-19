@@ -1,11 +1,20 @@
 import { prisma } from "@/src/lib/prisma";
 import { createCustomer } from "@/src/lib/actions/costumer";
 import formatarTelefone from "@/src/lib/utils/formatarTelefone";
+import { MotoInputs } from "@/src/components/MotoInput";
 
 export default async function Clientes() {
-  const clientes = await prisma.customer.findMany();
+  const clientes = await prisma.customer.findMany({
+    include: {
+      motorcycles: true,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
 
   const MAX_LENGTH = 11;
+  const MAX_PLATE = 8;
 
   return (
     <main className="min-h-screen bg-gray-50 p-6 md:p-8">
@@ -97,6 +106,8 @@ export default async function Clientes() {
                 <option value="Várzea Grande">Várzea Grande</option>
               </select>
             </div>
+
+            <MotoInputs />
           </div>
 
           <button
@@ -109,7 +120,7 @@ export default async function Clientes() {
 
         <div className="mb-3">
           <h2 className="font-bold text-gray-900">
-            Clientes cadastrados:
+            Ultimos clientes cadastrados:
           </h2>
         </div>
 
@@ -137,9 +148,7 @@ export default async function Clientes() {
                     </p>
 
                     {cliente.empresa && (
-                      <p className="text-sm text-gray-500">
-                        {cliente.empresa}
-                      </p>
+                      <p className="text-sm text-gray-500">{cliente.empresa}</p>
                     )}
                   </div>
 
@@ -188,6 +197,29 @@ export default async function Clientes() {
                       {cliente.createdAt.toLocaleString("pt-BR")}
                     </p>
                   </div>
+                </div>
+
+                <div className="border-t border-gray-100 bg-gray-50/70 px-5 py-4">
+                  <p className="mb-2 text-xs font-medium uppercase tracking-wide text-gray-400">
+                    Motos
+                  </p>
+
+                  {cliente.motorcycles.length === 0 ? (
+                    <p className="text-sm text-gray-500">
+                      Nenhuma moto cadastrada
+                    </p>
+                  ) : (
+                    <div className="space-y-1">
+                      {cliente.motorcycles.map((moto) => (
+                        <p
+                          key={moto.id}
+                          className="text-sm font-medium text-gray-800"
+                        >
+                          {moto.nome} - {moto.placa}
+                        </p>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             ))

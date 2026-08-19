@@ -40,6 +40,7 @@ export default async function PedidoHistorico({
     },
     include: {
       customer: true,
+      motorcycle: true,
       items: {
         include: {
           product: true,
@@ -135,7 +136,7 @@ export default async function PedidoHistorico({
             </div>
 
             {pedido.customer.empresa && (
-              <div>
+              <div className="mb-4">
                 <p className="text-xs font-bold uppercase text-gray-500">
                   Empresa
                 </p>
@@ -143,6 +144,30 @@ export default async function PedidoHistorico({
                 <p className="border-b border-gray-800 pb-1 text-base font-semibold">
                   {pedido.customer.empresa}
                 </p>
+              </div>
+            )}
+
+            {pedido.motorcycle && (
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-xs font-bold uppercase text-gray-500">
+                    Moto
+                  </p>
+
+                  <p className="border-b border-gray-800 pb-1 text-base font-semibold">
+                    {pedido.motorcycle.nome}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-xs font-bold uppercase text-gray-500">
+                    Placa
+                  </p>
+
+                  <p className="border-b border-gray-800 pb-1 text-base font-semibold">
+                    {pedido.motorcycle.placa}
+                  </p>
+                </div>
               </div>
             )}
           </div>
@@ -251,6 +276,18 @@ export default async function PedidoHistorico({
               </div>
             </div>
           </div>
+
+          {pedido.observacoes && (
+            <div className="border-t-2 border-gray-800 p-4">
+              <p className="text-xs font-bold uppercase text-gray-500">
+                Observações
+              </p>
+
+              <p className="mt-1 text-sm font-medium">
+                {pedido.observacoes}
+              </p>
+            </div>
+          )}
 
           <div className="border-t-2 border-gray-800 p-4">
             <p className="text-sm font-semibold italic text-gray-700">

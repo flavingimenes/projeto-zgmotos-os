@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import DeleteCustomerButton from "@/src/components/DeleteCustomerButton";
 import formatarTelefone from "@/src/lib/utils/formatarTelefone";
+import { createMotorcycle, deleteMotorcycle } from "@/src/lib/actions/motorcylce";
 
 export default async function Cliente({
   params,
@@ -15,11 +16,20 @@ export default async function Cliente({
     where: {
       id,
     },
+    include: {
+      motorcycles: {
+        orderBy: {
+          createdAt: "desc",
+        },
+      },
+    },
   });
 
   if (!cliente) {
     notFound();
   }
+
+  const addMotorcycle = createMotorcycle.bind(null, cliente.id);
 
   return (
     <main className="min-h-screen bg-gray-50 p-6 md:p-8">
@@ -99,6 +109,74 @@ export default async function Cliente({
                 name={cliente.name}
               />
             </div>
+          </div>
+
+          <div className="border-t border-gray-100 px-5 py-5">
+            <p className="mb-3 text-sm font-semibold text-gray-900">
+              Motos do cliente
+            </p>
+
+            {cliente.motorcycles.length === 0 ? (
+              <p className="mb-4 text-sm text-gray-500">
+                Nenhuma moto cadastrada para este cliente.
+              </p>
+            ) : (
+              <div className="mb-4 space-y-2">
+                {cliente.motorcycles.map((moto) => (
+                  <div
+                    key={moto.id}
+                    className="flex items-center justify-between rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-sm"
+                  >
+                    <span className="font-medium text-gray-800">
+                      {moto.nome}
+                    </span>
+
+                    <span className="text-gray-500">{moto.placa}</span>
+
+                    <form
+                      action={deleteMotorcycle.bind(
+                        null,
+                        moto.id,
+                        cliente.id,
+                      )}
+                    >
+                      <button
+                        type="submit"
+                        className="text-sm font-medium text-red-600 hover:text-red-700"
+                      >
+                        Remover
+                      </button>
+                    </form>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <form
+              action={addMotorcycle}
+              className="grid gap-3 sm:grid-cols-[1fr_1fr_auto]"
+            >
+              <input
+                name="nome"
+                placeholder="Nome da moto"
+                required
+                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-black outline-none focus:border-gray-500"
+              />
+
+              <input
+                name="placa"
+                placeholder="Placa"
+                required
+                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-black outline-none focus:border-gray-500"
+              />
+
+              <button
+                type="submit"
+                className="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-700"
+              >
+                Cadastrar moto
+              </button>
+            </form>
           </div>
         </div>
       </div>

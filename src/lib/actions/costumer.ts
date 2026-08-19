@@ -10,12 +10,24 @@ export async function createCustomer(formData: FormData) {
   const phone = formData.get("phone")?.toString() || null;
   const city = formData.get("city")?.toString() || null;
 
+  const motoNome = formData.get("motoNome")?.toString().trim() || "";
+  const motoPlaca = formData.get("motoPlaca")?.toString().trim() || "";
+
   await prisma.customer.create({
     data: {
       name,
       empresa,
       phone,
       city,
+      motorcycles:
+        motoNome && motoPlaca
+          ? {
+              create: {
+                nome: motoNome,
+                placa: motoPlaca,
+              },
+            }
+          : undefined,
     },
   });
 
