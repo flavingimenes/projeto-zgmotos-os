@@ -1,6 +1,10 @@
 import Link from "next/link";
 import { prisma } from "@/src/lib/prisma";
 
+import { FiUsers } from "react-icons/fi";
+import { GoGear } from "react-icons/go";
+import { BsBoxSeam } from "react-icons/bs";
+
 function saudacao() {
   const hora = new Date().getHours();
   if (hora < 12) return "Bom dia";
@@ -56,9 +60,10 @@ export default async function Home() {
           <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
             <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
               Clientes cadastrados
+              
             </p>
-            <p className="mt-1 text-2xl font-bold text-gray-900">
-              {totalClientes}
+            <p className="mt-1 text-2xl font-bold text-gray-900 flex gap-4 items-center">
+              <FiUsers /> {totalClientes} 
             </p>
           </div>
 
@@ -66,8 +71,8 @@ export default async function Home() {
             <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
               Produtos no catálogo
             </p>
-            <p className="mt-1 text-2xl font-bold text-gray-900">
-              {totalProdutos}
+            <p className="mt-1 text-2xl font-bold text-gray-900 flex gap-4 items-center">
+              <GoGear /> {totalProdutos}
             </p>
           </div>
 
@@ -75,8 +80,8 @@ export default async function Home() {
             <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
               Pedidos registrados
             </p>
-            <p className="mt-1 text-2xl font-bold text-gray-900">
-              {totalPedidos}
+            <p className="mt-1 text-2xl font-bold text-gray-900 flex gap-4 items-center">
+              <BsBoxSeam /> {totalPedidos}
             </p>
           </div>
         </div>

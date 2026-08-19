@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { Sidebar } from "@/src/components/Sidebar"
+import { Sidebar, type SidebarLink} from "@/src/components/Sidebar"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,16 +18,16 @@ export const metadata: Metadata = {
   description: "SaaS para gerenciamento",
 };
 
-const sidebarLinks = [
-  { label: "Início", href: "/" },
-  { label: "Clientes", href: "/clientes" },
-  { label: "Novo Cliente", href: "/clientes/novo" },
-  { label: "Produtos", href: "/produtos" },
-  { label: "Novo Produto", href: "/produtos/novo" },
-  { label: "Novo Pedido", href: "/pedidos" },
-  { label: "Histórico De Pedidos", href: "/historicoPedidos" },
-  { label: "Sobre", href: "/sobre" },
-]
+const sidebarLinks: SidebarLink[] = [
+  { label: "Início", href: "/", icon: "house" },
+  { label: "Clientes", href: "/clientes", icon: "user" },
+  { label: "Novo Cliente", href: "/clientes/novo", icon: "moreUser" },
+  { label: "Produtos", href: "/produtos", icon: "product" },
+  { label: "Novo Produto", href: "/produtos/novo", icon: "newProduct" },
+  { label: "Novo Pedido", href: "/pedidos", icon: "newOrder" },
+  { label: "Histórico De Pedidos", href: "/historicoPedidos", icon: "orderHistory" },
+  { label: "Sobre", href: "/sobre", icon: "info" },
+];
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
