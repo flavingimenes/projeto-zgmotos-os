@@ -1,9 +1,14 @@
 import { prisma } from "@/src/lib/prisma";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import DeleteCustomerButton from "@/src/components/DeleteCustomerButton";
+import DeleteCustomerButton from "@/src/components/Buttons/DeleteCustomerButton";
 import formatarTelefone from "@/src/lib/utils/formatarTelefone";
-import { createMotorcycle, deleteMotorcycle } from "@/src/lib/actions/motorcylce";
+import {
+  createMotorcycle,
+  deleteMotorcycle,
+} from "@/src/lib/actions/motorcylce";
+import MotoEditInput from "@/src/components/MotoEditInput";
+import BackButton from "@/src/components/Buttons/BackButton";
 
 export default async function Cliente({
   params,
@@ -19,7 +24,7 @@ export default async function Cliente({
     include: {
       motorcycles: {
         orderBy: {
-          createdAt: "desc",
+          createdAt: "asc",
         },
       },
     },
@@ -33,6 +38,7 @@ export default async function Cliente({
 
   return (
     <main className="min-h-screen bg-gray-50 p-6 md:p-8">
+      <BackButton />
       <div className="mx-auto max-w-4xl">
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-gray-900">
@@ -41,6 +47,7 @@ export default async function Cliente({
         </div>
 
         <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+
           <div className="border-b border-gray-100 px-5 py-4">
             <p className="text-lg font-semibold text-gray-900">
               Nome: {cliente.name}
@@ -91,6 +98,7 @@ export default async function Cliente({
             </div>
           </div>
 
+          {/* Ações */}
           <div className="border-t border-gray-100 bg-gray-50/70 px-5 py-4">
             <p className="mb-3 text-sm font-semibold text-gray-900">
               Ações
@@ -111,6 +119,7 @@ export default async function Cliente({
             </div>
           </div>
 
+          {/* Motos */}
           <div className="border-t border-gray-100 px-5 py-5">
             <p className="mb-3 text-sm font-semibold text-gray-900">
               Motos do cliente
@@ -131,7 +140,9 @@ export default async function Cliente({
                       {moto.nome}
                     </span>
 
-                    <span className="text-gray-500">{moto.placa}</span>
+                    <span className="text-gray-500">
+                      {moto.placa}
+                    </span>
 
                     <form
                       action={deleteMotorcycle.bind(
@@ -152,31 +163,7 @@ export default async function Cliente({
               </div>
             )}
 
-            <form
-              action={addMotorcycle}
-              className="grid gap-3 sm:grid-cols-[1fr_1fr_auto]"
-            >
-              <input
-                name="nome"
-                placeholder="Nome da moto"
-                required
-                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-black outline-none focus:border-gray-500"
-              />
-
-              <input
-                name="placa"
-                placeholder="Placa"
-                required
-                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-black outline-none focus:border-gray-500"
-              />
-
-              <button
-                type="submit"
-                className="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-700"
-              >
-                Cadastrar moto
-              </button>
-            </form>
+            <MotoEditInput action={addMotorcycle} />
           </div>
         </div>
       </div>

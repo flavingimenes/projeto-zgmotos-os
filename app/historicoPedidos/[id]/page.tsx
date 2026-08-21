@@ -1,8 +1,12 @@
 import { prisma } from "@/src/lib/prisma";
 import { notFound } from "next/navigation";
-import { BotaoImprimir } from "@/src/components/PrintButton";
+import { BotaoImprimir } from "@/src/components/Buttons/PrintButton";
 import { metadataPedido } from "@/src/lib/metadata";
 import { Metadata } from "next";
+import Image from "next/image";
+
+import wallLogo from "@/assets/Pictures/wallLogo-removebg.png"
+import BackButton from "@/src/components/Buttons/BackButton";
 
 export async function generateMetadata({
   params,
@@ -66,6 +70,7 @@ export default async function PedidoHistorico({
 
   return (
     <main className="min-h-screen bg-gray-100 p-4 md:p-8 print:bg-white print:p-0">
+      <BackButton />
       <div className="mx-auto max-w-5xl print:max-w-none">
         <div className="mb-6 flex items-center justify-between print:hidden">
           <div>
@@ -80,7 +85,15 @@ export default async function PedidoHistorico({
 
           <BotaoImprimir />
         </div>
-
+          <div>
+            <Image
+              className="m-auto"
+              src={wallLogo}
+              alt="Logo da empresa"
+              width={400}
+              height={100}
+            />
+          </div>
         <div
           className="
             pedido-impressao
@@ -90,6 +103,7 @@ export default async function PedidoHistorico({
             bg-white
           "
         >
+          
           <div className="grid border-b-2 border-gray-800 grid-cols-[1fr_180px]">
             <div className="flex items-center gap-8 p-4">
               <div className="flex items-center gap-2 text-lg font-bold uppercase">

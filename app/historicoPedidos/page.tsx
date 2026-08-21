@@ -1,6 +1,6 @@
 import { prisma } from "@/src/lib/prisma";
 import Link from "next/link";
-import DeleteOrderButton from "@/src/components/DeleteOrderButton";
+import DeleteOrderButton from "@/src/components/Buttons/DeleteOrderButton";
 
 export default async function HistoricoPedidos({
   searchParams,
@@ -95,9 +95,9 @@ export default async function HistoricoPedidos({
           </button>
         </form>
 
-          <h2 className="font-bold text-gray-900 mb-3">
-            Ultimos pedidos feitos:
-          </h2>
+        <h2 className="font-bold text-gray-900 mb-3">
+          Ultimos pedidos feitos:
+        </h2>
 
         <div>
           {pedidos.length === 0 ? (
@@ -124,12 +124,10 @@ export default async function HistoricoPedidos({
                 );
 
                 return (
-                  
                   <div
                     key={pedido.id}
                     className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition hover:shadow-md"
                   >
-                    
                     <div className="flex flex-col gap-3 border-b border-gray-100 px-5 py-4 md:flex-row md:items-center md:justify-between">
                       <div>
                         <p className="text-lg font-semibold text-gray-900">
@@ -176,7 +174,7 @@ export default async function HistoricoPedidos({
 
                       <div>
                         <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
-                          Pagamento 
+                          Pagamento
                         </p>
                         <p className="mt-1 text-sm font-medium text-gray-800">
                           {pedido.pagamento}
@@ -221,9 +219,8 @@ export default async function HistoricoPedidos({
                                 {item.product.nome}
                               </span>
                             </div>
-                              
+
                             <span className="font-medium text-gray-800">
-                              
                               {Number(item.valorUnitario).toLocaleString(
                                 "pt-BR",
                                 {
@@ -237,15 +234,23 @@ export default async function HistoricoPedidos({
                       </div>
                     </div>
 
-                    {pedido.prazoEntrega && (
+                    {pedido.prazoEntrega ? (
                       <div className="border-t border-gray-100 px-5 py-3">
                         <p className="text-sm text-gray-500">
                           <span className="font-medium text-gray-700">
                             Prazo de entrega:
                           </span>{" "}
-                          {new Date(
-                            pedido.prazoEntrega,
-                          ).toLocaleDateString("pt-BR")}
+                          {new Date(pedido.prazoEntrega).toLocaleDateString(
+                            "pt-BR",
+                          )}
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="border-t border-gray-100 px-5 py-3">
+                        <p className="text-sm text-gray-500">
+                          <span className="font-medium text-gray-500">
+                            Prazo de entrega não informado
+                          </span>
                         </p>
                       </div>
                     )}
@@ -275,10 +280,10 @@ export default async function HistoricoPedidos({
                       Editar pedido
                     </Link>
 
-                    <DeleteOrderButton 
+                    <DeleteOrderButton
                       id={pedido.id}
                       nome={pedido.customer.name}
-                      />
+                    />
                   </div>
                 );
               })}

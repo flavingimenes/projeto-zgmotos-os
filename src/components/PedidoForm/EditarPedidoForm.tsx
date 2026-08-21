@@ -1,20 +1,53 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { createOrder } from "../../lib/actions/order";
+import { useState } from "react";
+import { updateOrder } from "../../lib/actions/order";
 import { criarItem, type Item, type Produto, type Cliente } from "./itens";
 import { useRouter } from "next/navigation";
 
-interface PedidoFormProps {
+interface PedidoExistente {
+  id: string;
+  tipo: "PEDIDO" | "ORCAMENTO";
+  pagamento: string;
+  prazoEntrega?: string | null;
+  observacoes?: string | null;
+  customerId: string;
+  motorcycleId?: string | null;
+  items: {
+    id: string;
+    productId: string;
+    productName: string;
+    quantidade: number;
+    valorUnitario: number;
+  }[];
+}
+
+interface EditarPedidoFormProps {
   clientes: Cliente[];
   produtos: Produto[];
+  pedido: PedidoExistente;
 }
 
 const formatBRL = (valor: number) =>
   valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
-export function PedidoForm({ clientes, produtos }: PedidoFormProps) {
-  const [itens, setItens] = useState<Item[]>([]);
+export default function EditarPedidoForm({
+  clientes,
+  produtos,
+  pedido,
+}: EditarPedidoFormProps) {
+  const clienteDoPedido =
+    clientes.find((c) => c.id === pedido.customerId) ?? null;
+
+  const [itens, setItens] = useState<Item[]>(() =>
+    pedido.items.map((item) => ({
+      id: item.id,
+      productId: item.productId,
+      productName: item.productName,
+      quantity: item.quantidade,
+      unitPrice: item.valorUnitario,
+    })),
+  );
 
   const [produtoSelecionado, setProdutoSelecionado] = useState<Produto | null>(
     null,
@@ -23,71 +56,26 @@ export function PedidoForm({ clientes, produtos }: PedidoFormProps) {
   const [buscaProduto, setBuscaProduto] = useState("");
   const [listaAberta, setListaAberta] = useState(false);
 
-  const [clienteSelecionado, setClienteSelecionado] = useState<Cliente | null>(
-    null,
-  );
-  const [buscaCliente, setBuscaCliente] = useState("");
-  const [listaClienteAberta, setListaClienteAberta] = useState(false);
-  const [motoId, setMotoId] = useState("");
+  const [motoId, setMotoId] = useState(pedido.motorcycleId ?? "");
 
-  const [tipo, setTipo] = useState<"" | "PEDIDO" | "ORCAMENTO">("");
-  const [pagamento, setPagamento] = useState("");
-  const [prazoEntrega, setPrazoEntrega] = useState("");
-  const [observacoes, setObservacoes] = useState("");
+  const [tipo, setTipo] = useState<"" | "PEDIDO" | "ORCAMENTO">(pedido.tipo);
+  const [pagamento, setPagamento] = useState(pedido.pagamento);
+  const [prazoEntrega, setPrazoEntrega] = useState(pedido.prazoEntrega ?? "");
+  const [observacoes, setObservacoes] = useState(pedido.observacoes ?? "");
 
   const [salvando, setSalvando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
 
-  const comboboxRef = useRef<HTMLDivElement>(null);
-  const comboboxClienteRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
   const produtosFiltrados = produtos.filter((produto) =>
     produto.nome.toLowerCase().includes(buscaProduto.trim().toLowerCase()),
   );
 
-  const clientesFiltrados = clientes.filter((cliente) => {
-    const termo = buscaCliente.trim().toLowerCase();
-    return (
-      cliente.name.toLowerCase().includes(termo) ||
-      (cliente.empresa ?? "").toLowerCase().includes(termo)
-    );
-  });
-
-  useEffect(() => {
-    function aoClicarFora(evento: MouseEvent) {
-      if (
-        comboboxRef.current &&
-        !comboboxRef.current.contains(evento.target as Node)
-      ) {
-        setListaAberta(false);
-      }
-
-      if (
-        comboboxClienteRef.current &&
-        !comboboxClienteRef.current.contains(evento.target as Node)
-      ) {
-        setListaClienteAberta(false);
-      }
-    }
-
-    document.addEventListener("mousedown", aoClicarFora);
-    return () => document.removeEventListener("mousedown", aoClicarFora);
-  }, []);
-
   function selecionarProduto(produto: Produto) {
     setProdutoSelecionado(produto);
     setBuscaProduto(produto.nome);
     setListaAberta(false);
-  }
-
-  function selecionarCliente(cliente: Cliente) {
-    setClienteSelecionado(cliente);
-    setBuscaCliente(
-      cliente.empresa ? `${cliente.name} - ${cliente.empresa}` : cliente.name,
-    );
-    setListaClienteAberta(false);
-    setMotoId("");
   }
 
   function removerItem(id: string) {
@@ -120,20 +108,6 @@ export function PedidoForm({ clientes, produtos }: PedidoFormProps) {
     setBuscaProduto("");
   }
 
-  function resetarFormulario() {
-    setItens([]);
-    setClienteSelecionado(null);
-    setBuscaCliente("");
-    setMotoId("");
-    setTipo("");
-    setPagamento("");
-    setPrazoEntrega("");
-    setObservacoes("");
-    setProdutoSelecionado(null);
-    setBuscaProduto("");
-    setQuantidade(1);
-  }
-
   const total = itens.reduce(
     (soma, item) => soma + item.quantity * item.unitPrice,
     0,
@@ -141,11 +115,6 @@ export function PedidoForm({ clientes, produtos }: PedidoFormProps) {
 
   async function handleSalvar() {
     setErro(null);
-
-    if (!clienteSelecionado) {
-      setErro("Selecione um cliente.");
-      return;
-    }
 
     if (!tipo) {
       setErro("Selecione o tipo do pedido.");
@@ -165,8 +134,8 @@ export function PedidoForm({ clientes, produtos }: PedidoFormProps) {
     setSalvando(true);
 
     try {
-      await createOrder({
-        customerId: clienteSelecionado.id,
+      await updateOrder(pedido.id, {
+        customerId: pedido.customerId,
         motorcycleId: motoId || undefined,
         tipo,
         pagamento,
@@ -179,8 +148,6 @@ export function PedidoForm({ clientes, produtos }: PedidoFormProps) {
         })),
       });
 
-      resetarFormulario();
-      router.refresh();
     } catch (error) {
       console.error(error);
       setErro("Não foi possível salvar o pedido. Tente novamente.");
@@ -196,68 +163,23 @@ export function PedidoForm({ clientes, produtos }: PedidoFormProps) {
         className="mb-8 rounded-lg border border-gray-200 bg-white p-4 shadow-sm sm:p-5"
       >
         <div className="grid gap-4 sm:grid-cols-2">
+          {/* Cliente — somente exibição, não editável */}
           <div className="sm:col-span-2">
             <label className="mb-1 block text-sm font-medium text-gray-700">
               Cliente
             </label>
 
-            <div ref={comboboxClienteRef} className="relative">
-              <input
-                type="text"
-                role="combobox"
-                aria-expanded={listaClienteAberta}
-                aria-controls="lista-clientes"
-                autoComplete="off"
-                value={buscaCliente}
-                onChange={(e) => {
-                  setBuscaCliente(e.target.value);
-                  setClienteSelecionado(null);
-                  setMotoId("");
-                  setListaClienteAberta(true);
-                }}
-                onFocus={() => setListaClienteAberta(true)}
-                placeholder="Buscar cliente..."
-                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-black outline-none transition focus:border-gray-500 focus:ring-2 focus:ring-gray-200"
-              />
-
-              {listaClienteAberta && (
-                <ul
-                  id="lista-clientes"
-                  role="listbox"
-                  className="absolute z-10 mt-1 max-h-56 w-full overflow-auto rounded-md border border-gray-200 bg-white py-1 shadow-lg"
-                >
-                  {clientesFiltrados.length === 0 ? (
-                    <li className="px-3 py-2 text-sm text-gray-500">
-                      Nenhum cliente encontrado
-                    </li>
-                  ) : (
-                    clientesFiltrados.map((cliente) => (
-                      <li
-                        key={cliente.id}
-                        role="option"
-                        aria-selected={clienteSelecionado?.id === cliente.id}
-                      >
-                        <button
-                          type="button"
-                          onClick={() => selecionarCliente(cliente)}
-                          className="flex w-full items-center justify-between gap-2 px-3 py-2 text-left text-sm text-black hover:bg-gray-100"
-                        >
-                          <span className="truncate">{cliente.name}</span>
-                          {cliente.empresa && (
-                            <span className="whitespace-nowrap text-gray-500">
-                              {cliente.empresa}
-                            </span>
-                          )}
-                        </button>
-                      </li>
-                    ))
-                  )}
-                </ul>
-              )}
+            <div className="w-full rounded-md border border-gray-200 bg-gray-100 px-3 py-2 text-gray-700">
+              {clienteDoPedido
+                ? clienteDoPedido.empresa
+                  ? `${clienteDoPedido.name} - ${clienteDoPedido.empresa}`
+                  : clienteDoPedido.name
+                : "Cliente não encontrado"}
             </div>
           </div>
 
-          {clienteSelecionado && clienteSelecionado.motorcycles.length > 0 && (
+          {/* Moto do cliente — editável */}
+          {clienteDoPedido && clienteDoPedido.motorcycles.length > 0 && (
             <div className="sm:col-span-2">
               <label className="mb-1 block text-sm font-medium text-gray-700">
                 Moto do cliente
@@ -272,7 +194,7 @@ export function PedidoForm({ clientes, produtos }: PedidoFormProps) {
                 className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-black outline-none focus:border-gray-500"
               >
                 <option value="">Nenhuma</option>
-                {clienteSelecionado.motorcycles.map((moto) => (
+                {clienteDoPedido.motorcycles.map((moto) => (
                   <option key={moto.id} value={moto.id}>
                     {moto.nome} - {moto.placa}
                   </option>
@@ -287,7 +209,7 @@ export function PedidoForm({ clientes, produtos }: PedidoFormProps) {
             </h2>
 
             <div className="grid gap-4 sm:grid-cols-[1fr_120px_auto]">
-              <div ref={comboboxRef} className="relative">
+              <div className="relative">
                 <label className="mb-1 block text-sm font-medium text-gray-700">
                   Produto
                 </label>
@@ -497,7 +419,7 @@ export function PedidoForm({ clientes, produtos }: PedidoFormProps) {
           disabled={salvando}
           className="mt-5 w-full rounded-md bg-gray-900 px-5 py-2 text-sm font-medium text-white transition hover:bg-gray-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-gray-400 sm:w-auto"
         >
-          {salvando ? "Salvando..." : "Salvar"}
+          {salvando ? "Salvando..." : "Salvar alterações"}
         </button>
       </form>
     </div>

@@ -1,7 +1,8 @@
 import { prisma } from "@/src/lib/prisma";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import DeleteProductButton from "@/src/components/DeleteProductButton";
+import DeleteProductButton from "@/src/components/Buttons/DeleteProductButton";
+import BackButton from "@/src/components/Buttons/BackButton";
 
 export default async function Produto({
   params,
@@ -22,6 +23,7 @@ export default async function Produto({
 
   return (
     <main className="min-h-screen bg-gray-50 p-6 md:p-8">
+      <BackButton />
       <div className="mx-auto max-w-4xl">
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-gray-900">

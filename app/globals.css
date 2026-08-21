@@ -18,6 +18,28 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+@font-face {
+    font-family: "SFBold";
+    src: url("/fonts/sf-pro-display/SFPRODISPLAYBOLD.OTF") format("truetype");
+    font-weight: 400;
+    font-style:normal;
+}
+
+@font-face {
+    font-family: "SFRegular";
+    src: url("/fonts/sf-pro-display/SFPRODISPLAYREGULAR.OTF") format("truetype");
+    font-weight: 400;
+    font-style:normal;
+}
+
+.font-sf {
+  font-family: "SFBold", sans-serif;
+}
+
+.font-sfRegular {
+  font-family: "SFRegular", sans-serif;
+}
+
 @page {
   size: A4 portrait;
   margin: 10mm;
@@ -25,9 +47,9 @@ body {
 
 @media print {
   @page {
-    size: A4 portrait;
-    margin: 10mm;
-  }
+  size: A4 portrait;
+  margin: 0mm 10mm 10mm 10mm;
+}
 
   html,
   body {

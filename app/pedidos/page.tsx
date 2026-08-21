@@ -187,7 +187,7 @@ export default async function Pedidos() {
                   </div>
                 </div>
 
-                {pedido.prazoEntrega && (
+                {pedido.prazoEntrega ? (
                   <div className="border-t border-gray-100 px-5 py-3">
                     <p className="text-sm text-gray-500">
                       <span className="font-medium text-gray-700">
@@ -196,6 +196,14 @@ export default async function Pedidos() {
                       {new Date(pedido.prazoEntrega).toLocaleDateString(
                         "pt-BR",
                       )}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="border-t border-gray-100 px-5 py-3">
+                    <p className="text-sm text-gray-500">
+                      <span className="font-medium text-gray-500">
+                        Prazo de entrega não informado
+                      </span>
                     </p>
                   </div>
                 )}

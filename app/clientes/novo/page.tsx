@@ -3,6 +3,8 @@ import { createCustomer } from "@/src/lib/actions/costumer";
 import formatarTelefone from "@/src/lib/utils/formatarTelefone";
 import { MotoInputs } from "@/src/components/MotoInput";
 
+import { User, Building2, Phone, MapPin } from "lucide-react";
+
 export default async function Clientes() {
   const clientes = await prisma.customer.findMany({
     include: {
@@ -47,12 +49,16 @@ export default async function Clientes() {
                 Nome
               </label>
 
-              <input
-                name="name"
-                placeholder="Nome completo"
-                required
-                className="w-full rounded-lg border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm text-black outline-none transition placeholder:text-gray-400 focus:border-gray-400 focus:bg-white"
-              />
+              <div className="relative">
+                <User className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+
+                <input
+                  name="name"
+                  placeholder="Nome completo"
+                  required
+                  className="w-full rounded-lg border border-gray-200 bg-gray-50 py-2.5 pl-9 pr-4 text-sm text-black outline-none transition placeholder:text-gray-400 focus:border-gray-400 focus:bg-white"
+                />
+              </div>
             </div>
 
             <div>
@@ -63,11 +69,15 @@ export default async function Clientes() {
                 </span>
               </label>
 
-              <input
-                name="empresa"
-                placeholder="Nome da empresa"
-                className="w-full rounded-lg border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm text-black outline-none transition placeholder:text-gray-400 focus:border-gray-400 focus:bg-white"
-              />
+              <div className="relative">
+                <Building2 className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+
+                <input
+                  name="empresa"
+                  placeholder="Nome da empresa"
+                  className="w-full rounded-lg border border-gray-200 bg-gray-50 py-2.5 pl-9 pr-4 text-sm text-black outline-none transition placeholder:text-gray-400 focus:border-gray-400 focus:bg-white"
+                />
+              </div>
             </div>
 
             <div>
@@ -78,14 +88,18 @@ export default async function Clientes() {
                 </span>
               </label>
 
-              <input
-                name="phone"
-                type="tel"
-                inputMode="numeric"
-                maxLength={MAX_LENGTH}
-                placeholder="(65) 99999-9999"
-                className="w-full rounded-lg border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm text-black outline-none transition placeholder:text-gray-400 focus:border-gray-400 focus:bg-white"
-              />
+              <div className="relative">
+                <Phone className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+
+                <input
+                  name="phone"
+                  type="tel"
+                  inputMode="numeric"
+                  maxLength={MAX_LENGTH}
+                  placeholder="(65) 99999-9999"
+                  className="w-full rounded-lg border border-gray-200 bg-gray-50 py-2.5 pl-9 pr-4 text-sm text-black outline-none transition placeholder:text-gray-400 focus:border-gray-400 focus:bg-white"
+                />
+              </div>
             </div>
 
             <div>
@@ -93,18 +107,22 @@ export default async function Clientes() {
                 Cidade
               </label>
 
-              <select
-                name="city"
-                defaultValue=""
-                className="w-full rounded-lg border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm text-black outline-none transition focus:border-gray-400 focus:bg-white"
-              >
-                <option value="" disabled>
-                  Selecione a cidade
-                </option>
+              <div className="relative">
+                <MapPin className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
 
-                <option value="Cuiabá">Cuiabá</option>
-                <option value="Várzea Grande">Várzea Grande</option>
-              </select>
+                <select
+                  name="city"
+                  defaultValue=""
+                  className="w-full appearance-none rounded-lg border border-gray-200 bg-gray-50 py-2.5 pl-9 pr-4 text-sm text-black outline-none transition focus:border-gray-400 focus:bg-white"
+                >
+                  <option value="" disabled>
+                    Selecione a cidade
+                  </option>
+
+                  <option value="Cuiabá">Cuiabá</option>
+                  <option value="Várzea Grande">Várzea Grande</option>
+                </select>
+              </div>
             </div>
 
             <MotoInputs />

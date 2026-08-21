@@ -1,5 +1,6 @@
 import { prisma } from "@/src/lib/prisma";
 import { createProduct } from "@/src/lib/actions/product";
+import { Package, FileText } from "lucide-react";
 
 export default async function Produtos() {
   const produtos = await prisma.product.findMany({
@@ -41,12 +42,16 @@ export default async function Produtos() {
                 Nome
               </label>
 
-              <input
-                name="name"
-                placeholder="Nome do produto/peça"
-                required
-                className="w-full rounded-lg border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm text-black outline-none transition placeholder:text-gray-400 focus:border-gray-400 focus:bg-white"
-              />
+              <div className="relative">
+                <Package className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+
+                <input
+                  name="name"
+                  placeholder="Nome do produto/peça"
+                  required
+                  className="w-full rounded-lg border border-gray-200 bg-gray-50 py-2.5 pl-9 pr-4 text-sm text-black outline-none transition placeholder:text-gray-400 focus:border-gray-400 focus:bg-white"
+                />
+              </div>
             </div>
 
             <div>
@@ -77,11 +82,15 @@ export default async function Produtos() {
                 </span>
               </label>
 
-              <input
-                name="descricao"
-                placeholder="Descrição do produto"
-                className="w-full rounded-lg border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm text-black outline-none transition placeholder:text-gray-400 focus:border-gray-400 focus:bg-white"
-              />
+              <div className="relative">
+                <FileText className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+
+                <input
+                  name="descricao"
+                  placeholder="Descrição do produto"
+                  className="w-full rounded-lg border border-gray-200 bg-gray-50 py-2.5 pl-9 pr-4 text-sm text-black outline-none transition placeholder:text-gray-400 focus:border-gray-400 focus:bg-white"
+                />
+              </div>
             </div>
           </div>
 
@@ -110,7 +119,7 @@ export default async function Produtos() {
             </p>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-4 grid grid-cols-1 gap-4 md:grid-cols-2">
             {produtos.map((produto) => (
               <div
                 key={produto.id}

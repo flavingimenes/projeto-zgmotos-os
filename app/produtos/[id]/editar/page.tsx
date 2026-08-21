@@ -1,6 +1,7 @@
 import { prisma } from "@/src/lib/prisma";
 import { updateProduct } from "@/src/lib/actions/product";
 import { notFound } from "next/navigation";
+import BackButton from "@/src/components/Buttons/BackButton";
 
 export default async function EditarProduto({
   params,
@@ -23,6 +24,7 @@ export default async function EditarProduto({
 
   return (
     <main className="min-h-screen bg-gray-50 p-6">
+      <BackButton />
       <div className="mx-auto max-w-2xl">
         <h1 className="text-2xl font-semibold text-gray-900">
           Editar produto

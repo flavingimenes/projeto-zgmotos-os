@@ -51,102 +51,46 @@ export async function createOrder(input: CreateOrderInput) {
   };
 }
 
-export async function updateOrder(
-  id: string,
-  formData: FormData
-) {
-  const tipo = formData.get("tipo");
+interface UpdateOrderInput {
+  customerId: string;
+  motorcycleId?: string;
+  tipo: "PEDIDO" | "ORCAMENTO";
+  pagamento: string;
+  prazoEntrega?: string;
+  observacoes?: string;
+  items: {
+    productId: string;
+    quantidade: number;
+    valorUnitario: number;
+  }[];
+}
 
-  const pagamento = formData.get("pagamento");
-
-  const prazoEntrega = formData.get("prazoEntrega");
-
-  const observacoes = formData.get("observacoes");
-
-  const productIds = formData.getAll("productId");
-
-  const quantidades = formData.getAll("quantidade");
-
-  const valores = formData.getAll("valorUnitario");
-
-  if (
-    tipo !== "PEDIDO" &&
-    tipo !== "ORCAMENTO"
-  ) {
-    throw new Error("Tipo de pedido inválido.");
+export async function updateOrder(id: string, input: UpdateOrderInput) {
+  if (input.items.length === 0) {
+    throw new Error("O pedido precisa ter pelo menos um item.");
   }
-
-  if (typeof pagamento !== "string") {
-    throw new Error("Forma de pagamento inválida.");
-  }
-
-  if (typeof prazoEntrega !== "string") {
-    throw new Error("Prazo de entrega inválido.");
-  }
-
-  if (typeof observacoes !== "string") {
-    throw new Error("Observações inválidas.");
-  }
-
-  if (productIds.length === 0) {
-    throw new Error("O pedido precisa ter pelo menos um produto.");
-  }
-
-  if (
-    productIds.length !== quantidades.length ||
-    productIds.length !== valores.length
-  ) {
-    throw new Error("Os dados dos produtos estão incompletos.");
-  }
-
-  const items = productIds.map((productId, index) => {
-    const quantidade = Number(quantidades[index]);
-
-    const valorUnitario = Number(valores[index]);
-
-    if (typeof productId !== "string") {
-      throw new Error("Produto inválido.");
-    }
-
-    if (!Number.isInteger(quantidade) || quantidade <= 0) {
-      throw new Error("Quantidade inválida.");
-    }
-
-    if (!Number.isFinite(valorUnitario) || valorUnitario < 0) {
-      throw new Error("Valor unitário inválido.");
-    }
-
-    return {
-      productId,
-      quantidade,
-      valorUnitario,
-    };
-  });
 
   await prisma.$transaction(async (tx) => {
     await tx.order.update({
-      where: {
-        id,
-      },
-
+      where: { id },
       data: {
-        tipo,
-        pagamento,
-        prazoEntrega: prazoEntrega
-          ? new Date(prazoEntrega)
+        customerId: input.customerId,
+        motorcycleId: input.motorcycleId || null,
+        tipo: input.tipo,
+        pagamento: input.pagamento,
+        prazoEntrega: input.prazoEntrega
+          ? new Date(input.prazoEntrega)
           : null,
-        observacoes: observacoes || null,
+        observacoes: input.observacoes || null,
       },
     });
 
     await tx.orderItem.deleteMany({
-      where: {
-        orderId: id,
-      },
+      where: { orderId: id },
     });
 
     await tx.orderItem.createMany({
-      data: items.map((item) => ({
+      data: input.items.map((item) => ({
         orderId: id,
         productId: item.productId,
         quantidade: item.quantidade,

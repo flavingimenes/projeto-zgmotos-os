@@ -457,7 +457,7 @@ export function PedidoForm({ clientes, produtos }: PedidoFormProps) {
 
             <div>
               <label className="mb-1 block text-sm font-medium text-gray-700">
-                Prazo de entrega
+                Prazo de entrega <span className="text-gray-400">(opcional)</span>
               </label>
 
               <input

@@ -5,6 +5,8 @@ import { FiUsers } from "react-icons/fi";
 import { GoGear } from "react-icons/go";
 import { BsBoxSeam } from "react-icons/bs";
 
+import { TiArrowRightThick } from "react-icons/ti";
+
 function saudacao() {
   const hora = new Date().getHours();
   if (hora < 12) return "Bom dia";
@@ -46,7 +48,7 @@ export default async function Home() {
     <main className="min-h-screen bg-gray-50 p-6 md:p-8">
       <div className="mx-auto max-w-6xl">
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">
+          <h1 className="text-4xl font-sf text-gray-900 mb-2">
             {saudacao()}! 
           </h1>
 
@@ -95,12 +97,12 @@ export default async function Home() {
               href={acao.href}
               className="block rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition hover:shadow-md"
             >
-              <p className="text-lg font-semibold text-gray-900">
+              <p className="text-2xl font-semibold text-gray-900">
                 {acao.titulo}
               </p>
               <p className="mt-1 text-sm text-gray-500">{acao.descricao}</p>
-              <p className="mt-3 text-sm font-medium text-gray-600 underline">
-                Acessar 
+              <p className="mt-6 text-sm font-black text-blue-800 flex gap-2 items-center">
+                Acessar <TiArrowRightThick />
               </p>
             </Link>
           ))}

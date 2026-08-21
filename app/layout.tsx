@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { Sidebar, type SidebarLink} from "@/src/components/Sidebar"
+import { Sidebar, type SidebarGroup } from "@/src/components/Sidebar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,15 +18,76 @@ export const metadata: Metadata = {
   description: "SaaS para gerenciamento",
 };
 
-const sidebarLinks: SidebarLink[] = [
-  { label: "Início", href: "/", icon: "house" },
-  { label: "Clientes", href: "/clientes", icon: "user" },
-  { label: "Novo Cliente", href: "/clientes/novo", icon: "moreUser" },
-  { label: "Produtos", href: "/produtos", icon: "product" },
-  { label: "Novo Produto", href: "/produtos/novo", icon: "newProduct" },
-  { label: "Novo Pedido", href: "/pedidos", icon: "newOrder" },
-  { label: "Histórico De Pedidos", href: "/historicoPedidos", icon: "orderHistory" },
-  { label: "Sobre", href: "/sobre", icon: "info" },
+const groups: SidebarGroup[] = [
+  {
+    label: "Menu",
+    links: [
+      {
+        label: "Início",
+        href: "/",
+        icon: "house",
+      },
+    ],
+  },
+
+  {
+    label: "Clientes",
+    links: [
+      {
+        label: "Clientes",
+        href: "/clientes",
+        icon: "user",
+      },
+      {
+        label: "Novo Cliente",
+        href: "/clientes/novo",
+        icon: "moreUser",
+      },
+    ],
+  },
+
+  {
+    label: "Produtos",
+    links: [
+      {
+        label: "Produtos",
+        href: "/produtos",
+        icon: "product",
+      },
+      {
+        label: "Novo Produto",
+        href: "/produtos/novo",
+        icon: "newProduct",
+      },
+    ],
+  },
+
+  {
+    label: "Pedidos",
+    links: [
+      {
+        label: "Novo Pedido",
+        href: "/pedidos",
+        icon: "newOrder",
+      },
+      {
+        label: "Histórico De Pedidos",
+        href: "/historicoPedidos",
+        icon: "orderHistory",
+      },
+    ],
+  },
+
+  {
+    label: "Sistema",
+    links: [
+      {
+        label: "Sobre",
+        href: "/sobre",
+        icon: "info",
+      },
+    ],
+  },
 ];
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -36,15 +97,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body>
-
         <div className="flex p-4 min-h-screen">
           <div className="sticky top-4 h-fit">
-            <Sidebar links={sidebarLinks}
-            />
+            <Sidebar groups={groups} />
           </div>
           <main className="flex-1 p-1">{children}</main>
         </div>
-        
       </body>
     </html>
   );

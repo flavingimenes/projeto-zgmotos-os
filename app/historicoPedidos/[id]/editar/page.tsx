@@ -38,32 +38,49 @@ export default async function EditarPedido({
     },
   });
 
+  const clientes = await prisma.customer.findMany({
+  select: {
+    id: true,
+    name: true,
+    empresa: true,
+    motorcycles: {
+      select: {
+        id: true,
+        nome: true,
+        placa: true,
+      },
+    },
+  },
+  orderBy: {
+    name: "asc",
+  },
+});
+
   return (
     <EditarPedidoForm
-      pedido={{
-        id: pedido.id,
-        tipo: pedido.tipo,
-        pagamento: pedido.pagamento,
-        prazoEntrega: pedido.prazoEntrega
-          ? pedido.prazoEntrega.toISOString().split("T")[0]
-          : "",
-        customer: {
-          name: pedido.customer.name,
-          empresa: pedido.customer.empresa,
-        },
-        items: pedido.items.map((item) => ({
-          id: item.id,
-          productId: item.productId,
-          productNome: item.product.nome,
-          quantidade: item.quantidade,
-          valorUnitario: Number(item.valorUnitario),
-        })),
-      }}
-      produtos={produtos.map((produto) => ({
-        id: produto.id,
-        nome: produto.nome,
-        preco: Number(produto.preco),
-      }))}
-    />
+  pedido={{
+    id: pedido.id,
+    tipo: pedido.tipo,
+    pagamento: pedido.pagamento,
+    prazoEntrega: pedido.prazoEntrega
+      ? pedido.prazoEntrega.toISOString().split("T")[0]
+      : "",
+    customerId: pedido.customerId,       // <- adicionar
+    motorcycleId: pedido.motorcycleId,   // <- adicionar (se existir no model Order)
+    items: pedido.items.map((item) => ({
+      id: item.id,
+      productId: item.productId,
+      productName: item.product.nome,    // <- atenção ao nome do campo (ver abaixo)
+      quantidade: item.quantidade,
+      valorUnitario: Number(item.valorUnitario),
+    })),
+  }}
+  produtos={produtos.map((produto) => ({
+    id: produto.id,
+    nome: produto.nome,
+    preco: Number(produto.preco),
+  }))}
+  clientes={clientes}
+/>
   );
 }

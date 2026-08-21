@@ -1,6 +1,7 @@
 import { prisma } from "@/src/lib/prisma";
 import { updateCustomer } from "@/src/lib/actions/costumer";
 import { notFound } from "next/navigation";
+import BackButton from "@/src/components/Buttons/BackButton";
 
 export default async function EditarCliente({
   params,
@@ -25,6 +26,7 @@ export default async function EditarCliente({
 
   return (
     <main className="min-h-screen bg-gray-50 p-6 md:p-8">
+      <BackButton />
       <div className="mx-auto max-w-4xl">
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-gray-900">
