@@ -79,6 +79,17 @@ const groups: SidebarGroup[] = [
   },
 
   {
+    label: "Financeiro",
+    links: [
+      {
+        label: "Faturamento",
+        href: "/financeiro",
+        icon: "money",
+      },
+    ],
+  },
+
+  {
     label: "Sistema",
     links: [
       {

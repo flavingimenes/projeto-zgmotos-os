@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Logo from "@/assets/Pictures/LogoOficina.png";
 
-import { FaHouse } from "react-icons/fa6";
+import { FaHouse, FaSackDollar } from "react-icons/fa6";
 import {
   FaUserAlt,
   FaUserPlus,
@@ -24,6 +24,7 @@ const icons = {
   newProduct: FaBoxOpen,
   newOrder: FaCartPlus,
   orderHistory: FaClipboardList,
+  money: FaSackDollar,
   info: FaInfoCircle,
 };
 
