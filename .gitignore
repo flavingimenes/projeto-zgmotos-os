@@ -47,3 +47,6 @@ next-env.d.ts
 .agents/
 .claude/
 .windsurf/
+
+# banco local (não usado mais em produção)
+dev.db
