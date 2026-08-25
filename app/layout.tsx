@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Sidebar, type SidebarGroup } from "@/src/components/Sidebar";
 import { SidebarWrapper } from "@/src/components/SidebarWrapper";
+import { getUsuarioLogado } from "@/src/lib/actions/auth";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -102,7 +103,9 @@ const groups: SidebarGroup[] = [
   },
 ];
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  const usuario = await getUsuarioLogado();
+
   return (
     <html
       lang="pt-BR"
@@ -111,7 +114,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body>
         <div className="flex p-4 min-h-screen">
           <div className="sticky top-4 h-fit">
-            <SidebarWrapper groups={groups}/>
+            <SidebarWrapper 
+              groups={groups}
+              usuario={usuario}/>
           </div>
           <main className="flex-1 p-1">{children}</main>
         </div>

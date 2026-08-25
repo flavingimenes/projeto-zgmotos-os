@@ -40,7 +40,22 @@ export async function login(
     path: "/",
   });
 
+  cookieStore.set("usuario", usuario, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    maxAge: 60 * 60 * 24 * 7,
+    path: "/",
+  })
+
   redirect("/");
+}
+
+export async function getUsuarioLogado() {
+  const cookieStore = await cookies();
+  const usuario = cookieStore.get("usuario")?.value;
+
+  return usuario;
 }
 
 export async function logout() {

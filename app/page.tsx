@@ -7,8 +7,16 @@ import { BsBoxSeam } from "react-icons/bs";
 
 import { TiArrowRightThick } from "react-icons/ti";
 
+export const dynamic = "force-dynamic";
+
 function saudacao() {
-  const hora = new Date().getHours();
+  const hora = Number(
+    new Intl.DateTimeFormat("pt-BR", {
+      hour: "numeric",
+      hour12: false,
+      timeZone: "America/Cuiaba",
+    }).format(new Date())
+  );
   if (hora < 12) return "Bom dia";
   if (hora < 18) return "Boa tarde";
   return "Boa noite";

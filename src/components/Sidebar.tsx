@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import Logo from "@/assets/Pictures/LogoOficina.png";
 
 import { FaHouse, FaSackDollar } from "react-icons/fa6";
+
 import {
   FaUserAlt,
   FaUserPlus,
@@ -14,7 +15,9 @@ import {
   FaCartPlus,
   FaClipboardList,
   FaInfoCircle,
+  FaUserCircle,
 } from "react-icons/fa";
+import { logout } from "../lib/actions/auth";
 
 const icons = {
   house: FaHouse,
@@ -41,9 +44,10 @@ export interface SidebarGroup {
 
 interface SidebarProps {
   groups: SidebarGroup[];
+  usuario?: string;
 }
 
-export function Sidebar({ groups }: SidebarProps) {
+export function Sidebar({ groups, usuario }: SidebarProps) {
   const pathname = usePathname();
 
   return (
@@ -59,9 +63,7 @@ export function Sidebar({ groups }: SidebarProps) {
       <nav className="px-3 py-3">
         {groups.map((group, groupIndex) => (
           <div key={group.label}>
-            {groupIndex > 0 && (
-              <div className="my-3 h-px bg-gray-200" />
-            )}
+            {groupIndex > 0 && <div className="my-3 h-px bg-gray-200" />}
 
             <p className="mb-2 px-2 text-[11px] font-sf uppercase tracking-wide text-gray-500">
               {group.label}
@@ -102,6 +104,30 @@ export function Sidebar({ groups }: SidebarProps) {
           </div>
         ))}
       </nav>
+      <div className="pt-auto border-t border-gray-200 px-4 py-4">
+        <div className="flex items-center gap-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-100">
+            <FaUserCircle className="text-xl text-gray-500" />
+          </div>
+
+          <div className="min-w-0 flex-1">
+            <p className="font-sfRegular truncate text-sm font-semibold text-gray-800">
+              {usuario}
+            </p>
+
+            <p className="font-sfRegular text-xs text-gray-500">
+              Administrador
+            </p>
+          </div>
+        </div>
+
+        <button
+          onClick={logout}
+          className="mt-4 w-full cursor-pointer rounded-lg border border-gray-200 px-3 py-2 text-sm font-semibold text-gray-600 transition hover:bg-gray-100 hover:text-gray-900"
+        >
+          SAIR
+        </button>
+      </div>
     </aside>
   );
 }
