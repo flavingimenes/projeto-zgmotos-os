@@ -3,7 +3,7 @@
 import { useActionState } from "react";
 import { login } from "@/src/lib/actions/auth";
 import Image from "next/image";
-import WallLogo from "@/assets/Pictures/wallLogo-removebg.png";
+import newLogo from "@/assets/Pictures/newLogo.jpeg";
 
 const initialState = {
   success: false,
@@ -21,7 +21,7 @@ export default function LoginPage() {
       >
         <div className="mb-8 flex flex-col items-center text-center">
           <Image
-            src={WallLogo}
+            src={newLogo}
             alt="ZGMotos"
             width={350}
             height={100}
