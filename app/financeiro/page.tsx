@@ -32,7 +32,7 @@ function gerarAnosDisponiveis(anoAtual: number) {
 
 export default async function Financeiro({ searchParams }: FinanceiroProps) {
   const params = await searchParams;
-  
+
   const hoje = new Date();
 
   const mesParam = Number(params.mes);
@@ -54,6 +54,7 @@ export default async function Financeiro({ searchParams }: FinanceiroProps) {
   const inicioProximoMes = new Date(anoSelecionado, mesSelecionado, 1, 0, 0, 0);
 
   let pedidos: Array<{
+    tipo: "PEDIDO" | "ORCAMENTO";
     items: { quantidade: unknown; valorUnitario: unknown }[];
   }> = [];
   let erro: string | null = null;
@@ -67,6 +68,7 @@ export default async function Financeiro({ searchParams }: FinanceiroProps) {
         },
       },
       select: {
+        tipo: true,
         items: {
           select: {
             quantidade: true,
@@ -88,8 +90,16 @@ export default async function Financeiro({ searchParams }: FinanceiroProps) {
     return acc + totalPedido;
   }, 0);
 
+  const quantidadePedidos = pedidos.filter(
+    (pedido) => pedido.tipo === "PEDIDO",
+  ).length;
+
+  const quantidadeOrcamento = pedidos.filter(
+    (pedido) => pedido.tipo === "ORCAMENTO",
+  ).length;
+
   const anosDisponiveis = gerarAnosDisponiveis(hoje.getFullYear());
-  
+
   const nomeMesSelecionado = MESES.find(
     (m) => m.valor === mesSelecionado,
   )?.nome;
@@ -97,10 +107,6 @@ export default async function Financeiro({ searchParams }: FinanceiroProps) {
   return (
     <main className="mx-auto max-w-5xl px-6 py-10 lg:px-8">
       <div className="mb-8">
-        <span className="inline-flex rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-700">
-          Financeiro
-        </span>
-
         <h1 className="mt-3 text-3xl font-bold tracking-tight text-gray-900">
           Resumo financeiro
         </h1>
@@ -169,21 +175,63 @@ export default async function Financeiro({ searchParams }: FinanceiroProps) {
           {erro}
         </div>
       ) : (
-        <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-          <p className="text-sm font-medium text-gray-500">
-            Total de {nomeMesSelecionado} {anoSelecionado}
-          </p>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
+            <div className="w-full">
+              <p className="text-sm font-medium text-gray-500">
+                Total de {nomeMesSelecionado} {anoSelecionado}
+              </p>
 
-          <p className="mt-2 text-4xl font-bold text-gray-900">
-            {total.toLocaleString("pt-BR", {
-              style: "currency",
-              currency: "BRL",
-            })}
-          </p>
+              <p className="mt-2 text-4xl font-bold tracking-tight text-gray-900">
+                {total.toLocaleString("pt-BR", {
+                  style: "currency",
+                  currency: "BRL",
+                })}
+              </p>
 
-          <p className="mt-2 text-sm text-gray-500">
-            {pedidos.length} pedido(s) encontrado(s).
-          </p>
+              <div className="mt-6 grid grid-cols-2 gap-4 border-t border-gray-100 pt-4">
+                <div>
+                  <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
+                    Pedidos
+                  </p>
+
+                  <p className="mt-1 text-xl font-bold text-gray-800">
+                    {quantidadePedidos}
+                  </p>
+                </div>
+
+                <div className="border-l border-gray-100 pl-4">
+                  <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
+                    Orçamentos
+                  </p>
+
+                  <p className="mt-1 text-xl font-bold text-gray-800">
+                    {quantidadeOrcamento}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
+            <div>
+              <p className="text-sm font-medium text-gray-500">
+                Pedidos registrados
+              </p>
+
+              <p className="mt-2 text-4xl font-bold tracking-tight text-gray-900">
+                {pedidos.length}
+              </p>
+
+              <div className="mt-6 border-t border-gray-100 pt-4">
+                <p className="text-sm text-gray-500">
+                  {pedidos.length === 1
+                    ? "Pedido registrado no mês."
+                    : "Pedidos registrados no mês."}
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </main>
