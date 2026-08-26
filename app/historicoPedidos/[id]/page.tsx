@@ -69,47 +69,50 @@ export default async function PedidoHistorico({
     });
 
   return (
-    <main className="min-h-screen bg-gray-100 p-4 md:p-8 print:bg-white print:p-0">
+    <main className="min-h-screen bg-gray-100 p-4 md:p-6 print:bg-white print:p-0">
       <BackButton />
-      <div className="mx-auto max-w-5xl print:max-w-none">
-        <div className="mb-6 flex items-center justify-between print:hidden">
+      <div className="mx-auto max-w-3xl print:max-w-none">
+        <div className="mb-4 flex items-center justify-between print:hidden">
           <div>
-            <h1 className="text-2xl font-bold uppercase text-gray-900">
+            <h1 className="text-lg font-bold uppercase text-gray-900">
               Pedido #{pedido.id.slice(-6).toUpperCase()}
             </h1>
 
-            <p className="mt-1 text-sm text-gray-500">
+            <p className="mt-0.5 text-xs text-gray-500">
               Visualização detalhada do pedido
             </p>
           </div>
 
           <BotaoImprimir />
         </div>
-          <div>
-            <Image
-              className="m-auto"
-              src={wallLogo}
-              alt="Logo da empresa"
-              width={400}
-              height={100}
-            />
-          </div>
+
+        <div className="mb-4 flex justify-center">
+          <Image
+            src={wallLogo}
+            alt="Logo da empresa"
+            width={200}
+            height={50}
+          />
+        </div>
+
         <div
           className="
             pedido-impressao
             overflow-hidden
-            border-2
-            border-gray-800
+            rounded-sm
+            border
+            border-gray-300
             bg-white
+            text-sm
+            shadow-sm
           "
         >
-          
-          <div className="grid border-b-2 border-gray-800 grid-cols-[1fr_180px]">
-            <div className="flex items-center gap-8 p-4">
-              <div className="flex items-center gap-2 text-lg font-bold uppercase">
+          <div className="grid grid-cols-[1fr_130px] border-b border-gray-300">
+            <div className="flex items-center gap-6 px-4 py-2.5">
+              <div className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-gray-700">
                 <span
-                  className={`flex h-5 w-5 items-center justify-center border-2 border-gray-800 text-xs ${
-                    pedido.tipo === "PEDIDO" ? "bg-gray-800 text-white" : ""
+                  className={`flex h-4 w-4 items-center justify-center rounded-sm border border-gray-400 text-[10px] ${
+                    pedido.tipo === "PEDIDO" ? "bg-gray-800 text-white border-gray-800" : ""
                   }`}
                 >
                   {pedido.tipo === "PEDIDO" ? "✓" : ""}
@@ -117,10 +120,10 @@ export default async function PedidoHistorico({
                 Pedido
               </div>
 
-              <div className="flex items-center gap-2 text-lg font-bold uppercase">
+              <div className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-gray-700">
                 <span
-                  className={`flex h-5 w-5 items-center justify-center border-2 border-gray-800 text-xs ${
-                    pedido.tipo === "ORCAMENTO" ? "bg-gray-800 text-white" : ""
+                  className={`flex h-4 w-4 items-center justify-center rounded-sm border border-gray-400 text-[10px] ${
+                    pedido.tipo === "ORCAMENTO" ? "bg-gray-800 text-white border-gray-800" : ""
                   }`}
                 >
                   {pedido.tipo === "ORCAMENTO" ? "✓" : ""}
@@ -129,33 +132,33 @@ export default async function PedidoHistorico({
               </div>
             </div>
 
-            <div className="border-l-2 border-gray-800 p-3 text-center">
-              <p className="text-xs font-bold uppercase text-gray-500">Data</p>
+            <div className="border-l border-gray-300 px-3 py-2.5 text-center">
+              <p className="text-[10px] font-semibold uppercase tracking-wide text-gray-400">Data</p>
 
-              <p className="mt-1 text-lg font-semibold">
+              <p className="mt-0.5 text-sm font-semibold text-gray-800">
                 {new Date(pedido.createdAt).toLocaleDateString("pt-BR")}
               </p>
             </div>
           </div>
 
-          <div className="border-b-2 border-gray-800 p-4">
-            <div className="mb-4">
-              <p className="text-xs font-bold uppercase text-gray-500">
+          <div className="border-b border-gray-300 px-4 py-3">
+            <div className="mb-2.5">
+              <p className="text-[10px] font-semibold uppercase tracking-wide text-gray-400">
                 Cliente
               </p>
 
-              <p className="border-b border-gray-800 pb-1 text-base font-semibold">
+              <p className="border-b border-gray-200 pb-1 text-sm font-medium text-gray-800">
                 {pedido.customer.name}
               </p>
             </div>
 
             {pedido.customer.empresa && (
-              <div className="mb-4">
-                <p className="text-xs font-bold uppercase text-gray-500">
+              <div className="mb-2.5">
+                <p className="text-[10px] font-semibold uppercase tracking-wide text-gray-400">
                   Empresa
                 </p>
 
-                <p className="border-b border-gray-800 pb-1 text-base font-semibold">
+                <p className="border-b border-gray-200 pb-1 text-sm font-medium text-gray-800">
                   {pedido.customer.empresa}
                 </p>
               </div>
@@ -164,21 +167,21 @@ export default async function PedidoHistorico({
             {pedido.motorcycle && (
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-xs font-bold uppercase text-gray-500">
+                  <p className="text-[10px] font-semibold uppercase tracking-wide text-gray-400">
                     Moto
                   </p>
 
-                  <p className="border-b border-gray-800 pb-1 text-base font-semibold">
+                  <p className="border-b border-gray-200 pb-1 text-sm font-medium text-gray-800">
                     {pedido.motorcycle.nome}
                   </p>
                 </div>
 
                 <div>
-                  <p className="text-xs font-bold uppercase text-gray-500">
+                  <p className="text-[10px] font-semibold uppercase tracking-wide text-gray-400">
                     Placa
                   </p>
 
-                  <p className="border-b border-gray-800 pb-1 text-base font-semibold">
+                  <p className="border-b border-gray-200 pb-1 text-sm font-medium text-gray-800">
                     {pedido.motorcycle.placa}
                   </p>
                 </div>
@@ -186,31 +189,31 @@ export default async function PedidoHistorico({
             )}
           </div>
 
-          <div className="grid grid-cols-3 border-b-2 border-gray-800">
-            <div className="border-r-2 border-gray-800 p-4">
-              <p className="text-xs font-bold uppercase text-gray-500">
+          <div className="grid grid-cols-3 border-b border-gray-300">
+            <div className="border-r border-gray-300 px-4 py-2.5">
+              <p className="text-[10px] font-semibold uppercase tracking-wide text-gray-400">
                 Cidade
               </p>
 
-              <p className="mt-1 font-semibold">
+              <p className="mt-0.5 text-sm font-medium text-gray-800">
                 {pedido.customer.city || "-"}
               </p>
             </div>
 
-            <div className="border-r-2 border-gray-800 p-4">
-              <p className="text-xs font-bold uppercase text-gray-500">
+            <div className="border-r border-gray-300 px-4 py-2.5">
+              <p className="text-[10px] font-semibold uppercase tracking-wide text-gray-400">
                 Cond. de Pagamento
               </p>
 
-              <p className="mt-1 font-semibold">{pedido.pagamento}</p>
+              <p className="mt-0.5 text-sm font-medium text-gray-800">{pedido.pagamento}</p>
             </div>
 
-            <div className="p-4">
-              <p className="text-xs font-bold uppercase text-gray-500">
+            <div className="px-4 py-2.5">
+              <p className="text-[10px] font-semibold uppercase tracking-wide text-gray-400">
                 Prazo de Entrega
               </p>
 
-              <p className="mt-1 font-semibold">
+              <p className="mt-0.5 text-sm font-medium text-gray-800">
                 {pedido.prazoEntrega
                   ? new Date(pedido.prazoEntrega).toLocaleDateString("pt-BR")
                   : "-"}
@@ -219,20 +222,20 @@ export default async function PedidoHistorico({
           </div>
 
           <div>
-            <div className="grid grid-cols-[90px_1fr_140px_150px] bg-gray-800 text-white">
-              <div className="border-r border-gray-500 px-3 py-3 text-sm font-bold uppercase">
+            <div className="grid grid-cols-[70px_1fr_110px_120px] bg-gray-800 text-white">
+              <div className="border-r border-gray-600 px-3 py-2 text-[11px] font-semibold uppercase tracking-wide">
                 Quant.
               </div>
 
-              <div className="border-r border-gray-500 px-3 py-3 text-sm font-bold uppercase">
+              <div className="border-r border-gray-600 px-3 py-2 text-[11px] font-semibold uppercase tracking-wide">
                 Discriminação
               </div>
 
-              <div className="border-r border-gray-500 px-3 py-3 text-sm font-bold uppercase">
+              <div className="border-r border-gray-600 px-3 py-2 text-[11px] font-semibold uppercase tracking-wide">
                 Unit.
               </div>
 
-              <div className="px-3 py-3 text-sm font-bold uppercase">Total</div>
+              <div className="px-3 py-2 text-[11px] font-semibold uppercase tracking-wide">Total</div>
             </div>
 
             {pedido.items.map((item) => {
@@ -242,73 +245,73 @@ export default async function PedidoHistorico({
               return (
                 <div
                   key={item.id}
-                  className="grid grid-cols-[90px_1fr_140px_150px] border-b border-gray-800"
+                  className="grid grid-cols-[70px_1fr_110px_120px] border-b border-gray-200"
                 >
-                  <div className="border-r border-gray-800 px-3 py-3 text-sm">
+                  <div className="border-r border-gray-200 px-3 py-2 text-sm text-gray-700">
                     {item.quantidade}
                   </div>
 
-                  <div className="border-r border-gray-800 px-3 py-3 text-sm font-medium">
+                  <div className="border-r border-gray-200 px-3 py-2 text-sm font-medium text-gray-800">
                     {item.product.nome}
                   </div>
 
-                  <div className="border-r border-gray-800 px-3 py-3 text-sm">
+                  <div className="border-r border-gray-200 px-3 py-2 text-sm text-gray-700">
                     {formatCurrency(valorUnitario)}
                   </div>
 
-                  <div className="px-3 py-3 text-sm font-semibold">
+                  <div className="px-3 py-2 text-sm font-semibold text-gray-800">
                     {formatCurrency(subtotal)}
                   </div>
                 </div>
               );
             })}
 
-            {pedido.items.length < 10 &&
+            {pedido.items.length < 8 &&
               Array.from({
-                length: 10 - pedido.items.length,
+                length: 8 - pedido.items.length,
               }).map((_, index) => (
                 <div
                   key={`empty-${index}`}
-                  className="grid h-10 grid-cols-[90px_1fr_140px_150px] border-b border-gray-800"
+                  className="grid h-7 grid-cols-[70px_1fr_110px_120px] border-b border-gray-200"
                 >
-                  <div className="border-r border-gray-800" />
-                  <div className="border-r border-gray-800" />
-                  <div className="border-r border-gray-800" />
+                  <div className="border-r border-gray-200" />
+                  <div className="border-r border-gray-200" />
+                  <div className="border-r border-gray-200" />
                   <div />
                 </div>
               ))}
           </div>
 
-          <div className="flex justify-end">
+          <div className="flex justify-end border-t border-gray-300">
             <div className="flex">
-              <div className="bg-gray-800 px-7 py-4 text-base font-bold uppercase text-white">
+              <div className="bg-gray-800 px-5 py-2.5 text-sm font-semibold uppercase text-white">
                 Total R$
               </div>
 
-              <div className="min-w-47.5 border-l-2 border-gray-800 px-5 py-4 text-right text-xl font-bold">
+              <div className="min-w-35 border-l border-gray-300 px-4 py-2.5 text-right text-base font-bold text-gray-800">
                 {formatCurrency(total)}
               </div>
             </div>
           </div>
 
           {pedido.observacoes && (
-            <div className="border-t-2 border-gray-800 p-4">
-              <p className="text-xs font-bold uppercase text-gray-500">
+            <div className="border-t border-gray-300 px-4 py-3">
+              <p className="text-[10px] font-semibold uppercase tracking-wide text-gray-400">
                 Observações
               </p>
 
-              <p className="mt-1 text-sm font-medium">
+              <p className="mt-1 text-sm text-gray-700">
                 {pedido.observacoes}
               </p>
             </div>
           )}
 
-          <div className="border-t-2 border-gray-800 p-4">
-            <p className="text-sm font-semibold italic text-gray-700">
+          <div className="border-t border-gray-300 px-4 py-3">
+            <p className="text-xs font-medium italic text-gray-600">
               Agradecemos a preferência.
             </p>
 
-            <p className="mt-1 text-xs italic text-gray-500">
+            <p className="mt-0.5 text-[11px] italic text-gray-400">
               Pedido registrado em{" "}
               {new Date(pedido.createdAt).toLocaleString("pt-BR")}
             </p>
